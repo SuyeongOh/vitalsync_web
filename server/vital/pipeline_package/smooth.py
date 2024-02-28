@@ -6,6 +6,7 @@ from .base import SignalProcessingStep
 class Smooth(SignalProcessingStep):
     def __init__(self, window_size=5, **kwargs):
         super().__init__(**kwargs)
+        self.window_size = window_size
         self.kernel = np.ones(window_size) / window_size
         self.smoothed_signals = None
 
