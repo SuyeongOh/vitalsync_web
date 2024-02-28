@@ -37,26 +37,19 @@ def calculate_vital(vital_request: VitalRequest):
 
     # 계산된 결과를 반환합니다. 실제 애플리케이션에서는 계산 로직에 따라 결과가 달라질 것입니다.
 
-    #여기다가 코드 구현해서 넣으면 된단다.
+    # preprocess RGB data
+    RGB = np.asarray(vital_request.RGB).transpose(1, 0)
+    RGB = preprocess_pipeline.apply(RGB)
 
     # Calculate PPG
-    RGB = np.asarray(vital_request.RGB).transpose(1, 0)
-    rgb_plot(RGB)
-
-    RGB = preprocess_pipeline.apply(RGB)
-    rgb_plot(RGB)
-
-    pred_ppg = pos.POS(RGB, 30)
-    # pred_ppg = omit.OMIT(RGB)
-
+    pred_ppg = omit.OMIT(RGB)
     pred_ppg = postprocess_pipeline.apply(pred_ppg)
+
     # Calculate Vital
     vitalcalc = VitalCalculator(pred_ppg, 30, 'POS')
-    vitalcalc.visualize_ppg()
     fft_hr = vitalcalc.calc_fft_hr()
-    ibi_hr = vitalcalc.calc_ibi_hr()
+    # ibi_hr = vitalcalc.calc_ibi_hr()
     hrv = vitalcalc.calc_hrv()
-    print(f"fft_hr: {fft_hr}, ibi_hr: {ibi_hr}, hrv: {hrv}")
 
     response = VitalResponse(
         hr=fft_hr,

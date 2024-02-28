@@ -5,10 +5,9 @@ import scipy
 
 
 class VitalCalculator:
-    def __init__(self, ppg, fs, model):
+    def __init__(self, ppg, fs):
         self.ppg = ppg
         self.fs = fs
-        self.model = model
         self.peaks = None
         self.ibis = None
 
@@ -16,17 +15,6 @@ class VitalCalculator:
         self.ibi_hr = 0
         self.hrv = 0
 
-        self.save_dict = {'save_root_path': '/home/najy/shared_innopia/test_results/20240228/',
-                          'name': "test",
-                          'model': self.model, 'seq_num': 0, 'desc': 'DBH', 'show_flag': True,
-                          'figsize': (8, 9), 'fontsize': 10,
-                          'norm_flag': True, 'diff_flag': False}
-
-    def visualize_ppg(self):
-        bvp_fft_plot(self.ppg, self.fs, self.save_dict)
-
-    def visualize_rgb(self, rgb):
-        rgb_plot(rgb, self.save_dict)
 
     def calc_fft_hr(self):
         signal = np.expand_dims(self.ppg, 0)
