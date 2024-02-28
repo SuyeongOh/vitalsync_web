@@ -1,7 +1,11 @@
 from typing import List, Optional
 from fastapi import FastAPI, HTTPException, status
 from pydantic import BaseModel
-
+from pipeline_package import preprocess_pipeline, postprocess_pipeline
+from core import pos, omit
+from analysis.vital_calculator import VitalCalculator
+import numpy as np
+from analysis.visualizer import *
 vitalService = FastAPI()
 
 
@@ -34,9 +38,30 @@ def calculate_vital(vital_request: VitalRequest):
     # 계산된 결과를 반환합니다. 실제 애플리케이션에서는 계산 로직에 따라 결과가 달라질 것입니다.
 
     #여기다가 코드 구현해서 넣으면 된단다.
+
+    # Calculate PPG
+    RGB = np.asarray(vital_request.RGB).transpose(1, 0)
+    rgb_plot(RGB)
+
+    RGB = preprocess_pipeline.apply(RGB)
+
+    pred_ppg = pos.POS(RGB, 30)
+    # pred_ppg = omit.OMIT(RGB)
+
+    pred_ppg = postprocess_pipeline.apply(pred_ppg)
+
+    # Calculate Vital
+    vitalcalc = VitalCalculator(pred_ppg, 30, 'POS')
+    vitalcalc.visualize_rgb(RGB)
+    vitalcalc.visualize_ppg()
+    fft_hr = vitalcalc.calc_fft_hr()
+    ibi_hr = vitalcalc.calc_ibi_hr()
+    hrv = vitalcalc.calc_hrv()
+    print(f"fft_hr: {fft_hr}, ibi_hr: {ibi_hr}, hrv: {hrv}")
+
     response = VitalResponse(
-        hr=72.0,
-        hrv=58.2,
+        hr=fft_hr,
+        hrv=hrv,
         rr=16.0,
         spo2=98.5,
         stress=14.3,
@@ -144,3 +169,8 @@ def calculate_bp(vital_request: VitalRequest):
         message="Success"
     )
     return response
+
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(vitalService, host="0.0.0.0", port=1024)
