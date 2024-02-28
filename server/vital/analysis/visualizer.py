@@ -118,13 +118,7 @@ def bvp_fft_plot(ppg, fs, save_dict=None):
         plt.close()
 
 
-def rgb_plot(rgb, save_dict=None):
-    if save_dict is None:
-        save_dict = {'save_root_path': '/home/najy/shared_innopia/test_results/20240228/',
-                     'name': "test",
-                     'model': 'test', 'seq_num': 0, 'desc': 'DBH', 'show_flag': True,
-                     'figsize': (8, 9), 'fontsize': 10,
-                     'norm_flag': True, 'diff_flag': False}
+def rgb_plot(rgb, save_dict):
     """Plot the RGB signal separately."""
     save_root_path = save_dict['save_root_path']
     name = save_dict['name']
@@ -160,7 +154,6 @@ def rgb_plot(rgb, save_dict=None):
     if not os.path.isdir(save_path):
         os.makedirs(save_path)
     plt.savefig(f"{save_path}/{seq_num}_{name}_{desc}.png".replace(' ', '_'), dpi=300)
-    if save_dict['show_flag']:
-        plt.show()
+    plt.show()
     plt.close()
 
