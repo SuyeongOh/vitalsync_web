@@ -44,15 +44,14 @@ def calculate_vital(vital_request: VitalRequest):
     rgb_plot(RGB)
 
     RGB = preprocess_pipeline.apply(RGB)
+    rgb_plot(RGB)
 
     pred_ppg = pos.POS(RGB, 30)
     # pred_ppg = omit.OMIT(RGB)
 
     pred_ppg = postprocess_pipeline.apply(pred_ppg)
-
     # Calculate Vital
     vitalcalc = VitalCalculator(pred_ppg, 30, 'POS')
-    vitalcalc.visualize_rgb(RGB)
     vitalcalc.visualize_ppg()
     fft_hr = vitalcalc.calc_fft_hr()
     ibi_hr = vitalcalc.calc_ibi_hr()
