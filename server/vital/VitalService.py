@@ -46,11 +46,11 @@ def calculate_vital(vital_request: VitalRequest):
     pred_ppg = postprocess_pipeline.apply(pred_ppg)
 
     # Calculate Vital
-    vitalcalc = VitalCalculator(pred_ppg, 30, 'POS')
+    vitalcalc = VitalCalculator(pred_ppg, 30)
     fft_hr = vitalcalc.calc_fft_hr()
-    # ibi_hr = vitalcalc.calc_ibi_hr()
+    ibi_hr = vitalcalc.calc_ibi_hr()
     hrv = vitalcalc.calc_hrv()
-
+    print(f"fft_hr: {fft_hr}, ibi_hr: {ibi_hr}, hrv: {hrv}")
     response = VitalResponse(
         hr=fft_hr,
         hrv=hrv,
