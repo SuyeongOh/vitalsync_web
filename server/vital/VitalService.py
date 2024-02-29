@@ -7,6 +7,7 @@ from analysis.vital_calculator import VitalCalculator
 import numpy as np
 from analysis.visualizer import *
 vitalService = FastAPI()
+from datetime import datetime
 
 
 class VitalRequest(BaseModel):
@@ -38,9 +39,11 @@ def calculate_vital(vital_request: VitalRequest):
     # 계산된 결과를 반환합니다. 실제 애플리케이션에서는 계산 로직에 따라 결과가 달라질 것입니다.
 
     #여기다가 코드 구현해서 넣으면 된단다.
-    save_dict = {'save_root_path': '/home/najy/shared_innopia/test_results/20240228/',
-                 'name': "test",
-                 'model': 'POS', 'seq_num': 0, 'desc': 'Original RGB', 'show_flag': False,
+    today = datetime.today().strftime("%Y%m%d")
+    time = datetime.now().strftime("%H%M")
+    save_dict = {'save_root_path': f'/home/najy/shared_innopia/test_results/{today}/',
+                 'name': f"test_{time}",
+                 'model': 'OMIT', 'seq_num': 0, 'desc': 'Original RGB', 'show_flag': False, 'plot_peak': False,
                  'figsize': (8, 9), 'fontsize': 10,
                  'norm_flag': True, 'diff_flag': False}
 
@@ -53,14 +56,17 @@ def calculate_vital(vital_request: VitalRequest):
     save_dict['seq_num'] += 1
     rgb_plot(RGB, save_dict)
 
-    pred_ppg = pos.POS(RGB, 30)
-    # pred_ppg = omit.OMIT(RGB)
+    if save_dict['model'] == 'POS':
+        pred_ppg = pos.POS(RGB, 30)
+    elif save_dict['model'] == 'OMIT':
+        pred_ppg = omit.OMIT(RGB)
+    else:
+        raise ValueError(f"Invalid model name: {save_dict['model']}")
     save_dict['show_flag'] = True
 
     pred_ppg = postprocess_pipeline.apply(pred_ppg, save_dict)
     # Calculate Vital
     vitalcalc = VitalCalculator(pred_ppg, 30, save_dict['model'], save_dict)
-    vitalcalc.visualize_ppg()
     fft_hr = vitalcalc.calc_fft_hr()
     ibi_hr = vitalcalc.calc_ibi_hr()
     hrv = vitalcalc.calc_hrv()
