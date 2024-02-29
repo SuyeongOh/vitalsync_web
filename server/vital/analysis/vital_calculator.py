@@ -35,11 +35,13 @@ class VitalCalculator:
         return masked_fft_hr_ppg
 
     def calc_ibi_hr(self):
-        self.peaks, self.ibis = peak_detection(self.ppg, self.fs, 45, 150, windowsize=60 / self.fft_hr)
+        self.peaks, self.ibis = peak_detection(self.ppg, self.fs, 45, 150, windowsize=60 / self.fft_hr if self.fft_hr > 45 else 0.75)
         hr_list = np.divide(60000, self.ibis)
         self.ibi_hr = np.mean(hr_list)
         return self.ibi_hr
 
     def calc_hrv(self):
+        if self.ibis is None:
+            self.calc_ibi_hr()
         self.hrv = np.std(self.ibis, ddof=1)
         return self.hrv
