@@ -4,7 +4,6 @@ from pydantic import BaseModel
 from pipeline_package import preprocess_pipeline, postprocess_pipeline
 from core import pos, omit
 from analysis.vital_calculator import VitalCalculator
-import numpy as np
 from analysis.visualizer import *
 vitalService = FastAPI()
 
@@ -42,7 +41,7 @@ def calculate_vital(vital_request: VitalRequest):
     RGB = preprocess_pipeline.apply(RGB)
 
     # Calculate PPG
-    pred_ppg = omit.OMIT(RGB)
+    pred_ppg = pos.POS(RGB, 30)
     pred_ppg = postprocess_pipeline.apply(pred_ppg)
 
     # Calculate Vital
