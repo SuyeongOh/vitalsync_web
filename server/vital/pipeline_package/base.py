@@ -44,7 +44,6 @@ class SignalProcessingStep:
             # Plot signal @Time Domain with peak dots
             # peaks_pred, _ = find_peaks(signal, distance=save_dict["peak_distance"])
             axs[0].plot(signal, label=model_name, color='blue')
-            axs[0].set_title(f"{name} | {model_name} : {desc} @Time Domain")
             axs[0].legend(loc='upper right')
             axs[0].grid()
             ################################################################################################################
@@ -67,6 +66,12 @@ class SignalProcessingStep:
                 peaks_pred, _ = peak_detection(ppg=signal.squeeze(), fs=fs, bpmmin=45, bpmmax=150,
                                                windowsize=60 / fft_hr_pred if fft_hr_pred > 0 else 0.75)
                 peaks_filtered = [peak for peak in peaks_pred if signal.squeeze()[peak] > 0.8]
+                ibis = np.diff(peaks_pred) / fs * 1000
+                hr_list = np.divide(60000, ibis)
+                ibi_hr = np.mean(hr_list)
+                hrv = np.std(ibis)
+                axs[0].set_title(f"{name} | {model_name} : {desc} @Time Domain\n"
+                                 f"FFT HR: {fft_hr_pred:.2f} BPM | IBI HR: {ibi_hr:.2f} BPM | HRV: {hrv:.2f} ms")
                 axs[0].plot(peaks_pred, signal.squeeze()[peaks_pred], "o", color='orange')
                 axs[0].plot(peaks_filtered, signal.squeeze()[peaks_filtered], "x", color='red')
 

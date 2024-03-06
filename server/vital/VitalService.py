@@ -40,10 +40,10 @@ def calculate_vital(vital_request: VitalRequest):
 
     #여기다가 코드 구현해서 넣으면 된단다.
     today = datetime.today().strftime("%Y%m%d")
-    time = datetime.now().strftime("%H%M")
+    time = datetime.now().strftime("%H%M%S")
     save_dict = {'save_root_path': f'/home/najy/shared_innopia/test_results/{today}/',
                  'name': f"test_{time}",
-                 'model': 'OMIT', 'seq_num': 0, 'desc': 'Original RGB', 'show_flag': False, 'plot_peak': False,
+                 'model': 'POS', 'seq_num': 0, 'desc': 'Original RGB', 'show_flag': False, 'plot_peak': False,
                  'figsize': (8, 9), 'fontsize': 10,
                  'norm_flag': True, 'diff_flag': False}
 
@@ -70,7 +70,7 @@ def calculate_vital(vital_request: VitalRequest):
     fft_hr = vitalcalc.calc_fft_hr()
     ibi_hr = vitalcalc.calc_ibi_hr()
     hrv = vitalcalc.calc_hrv()
-    print(f"fft_hr: {fft_hr}, ibi_hr: {ibi_hr}, hrv: {hrv}")
+    print(f"date: {today}, time: {time}, fft_hr: {fft_hr}, ibi_hr: {ibi_hr}, hrv: {hrv}")
 
     response = VitalResponse(
         hr=fft_hr,
