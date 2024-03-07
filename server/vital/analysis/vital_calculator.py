@@ -1,4 +1,3 @@
-from server.vital.analysis.utils import *
 from server.vital.analysis.visualizer import *
 import numpy as np
 import scipy

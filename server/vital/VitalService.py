@@ -2,7 +2,7 @@ from typing import List, Optional
 from fastapi import FastAPI, HTTPException, status
 from pydantic import BaseModel
 from server.vital.pipeline_package import preprocess_pipeline
-from server.vital.core import pos, omit
+from server.vital.core import pos#, omit
 from server.vital.analysis.vital_calculator import VitalCalculator
 from server.vital.analysis.visualizer import *
 from datetime import datetime
@@ -58,7 +58,7 @@ def calculate_vital(vital_request: VitalRequest):
         hr=fft_hr,
         hrv=hrv,
         rr=16.0,
-        spo2=98.5,
+        spo2=98.0,
         stress=lf_hf_ratio,
         bp=120.75,
         sbp=120.0,
