@@ -2,7 +2,7 @@ from .utils import *
 from .visualizer import *
 import numpy as np
 import scipy
-from server.vital.pipeline_package import heartrate_pipeline, lf_hf_pipeline, detrend
+from ..pipeline_package import heartrate_pipeline, lf_hf_pipeline, detrend
 
 
 class VitalCalculator:
