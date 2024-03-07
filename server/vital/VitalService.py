@@ -1,12 +1,13 @@
 from typing import List, Optional
 from fastapi import FastAPI, HTTPException, status
 from pydantic import BaseModel
-from pipeline_package import preprocess_pipeline
-from core import pos, omit
-from analysis.vital_calculator import VitalCalculator
-from analysis.visualizer import *
-vitalService = FastAPI()
+from server.vital.pipeline_package import preprocess_pipeline
+from server.vital.core import pos, omit
+from server.vital.analysis.vital_calculator import VitalCalculator
+from server.vital.analysis.visualizer import *
 from datetime import datetime
+
+vitalService = FastAPI()
 
 
 class VitalRequest(BaseModel):
@@ -147,6 +148,7 @@ def calculate_stress(vital_request: VitalRequest):
     )
     return response
 
+
 @vitalService.post("/vital/bp", response_model=VitalResponse)
 def calculate_bp(vital_request: VitalRequest):
     if not vital_request.RGB:
@@ -167,4 +169,5 @@ def calculate_bp(vital_request: VitalRequest):
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(vitalService, host="0.0.0.0", port=1024)

@@ -1,8 +1,8 @@
 from .pipeline import Pipeline
 from .detrend import Detrend
-from .bandpassfilter import BandpassFilter
-from .hilbert_normalization import HilbertNormalization
-from .smooth import Smooth
+from server.vital.pipeline_package.bandpassfilter import BandpassFilter
+from server.vital.pipeline_package.hilbert_normalization import HilbertNormalization
+from server.vital.pipeline_package.smooth import Smooth
 
 preprocess_pipeline = Pipeline(steps=[
     Smooth(),
