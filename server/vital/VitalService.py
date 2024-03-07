@@ -1,7 +1,7 @@
 from typing import List, Optional
 from fastapi import FastAPI, HTTPException, status
 from pydantic import BaseModel
-from pipeline_package import preprocess_pipeline, postprocess_pipeline
+from pipeline_package import preprocess_pipeline
 from core import pos, omit
 from analysis.vital_calculator import VitalCalculator
 import numpy as np
@@ -64,20 +64,20 @@ def calculate_vital(vital_request: VitalRequest):
         raise ValueError(f"Invalid model name: {save_dict['model']}")
     save_dict['show_flag'] = True
 
-    pred_ppg = postprocess_pipeline.apply(pred_ppg, save_dict)
     # Calculate Vital
-    vitalcalc = VitalCalculator(pred_ppg, 30, save_dict['model'], save_dict)
+    vitalcalc = VitalCalculator(pred_ppg, 30, save_dict)
     fft_hr = vitalcalc.calc_fft_hr()
     ibi_hr = vitalcalc.calc_ibi_hr()
     hrv = vitalcalc.calc_hrv()
-    print(f"date: {today}, time: {time}, fft_hr: {fft_hr}, ibi_hr: {ibi_hr}, hrv: {hrv}")
+    lf_hf_ratio = vitalcalc.calc_lfhf()
+    print(f"date: {today}, time: {time}, fft_hr: {fft_hr}, ibi_hr: {ibi_hr}, hrv: {hrv}, lf_hf_ratio: {lf_hf_ratio}")
 
     response = VitalResponse(
         hr=fft_hr,
         hrv=hrv,
         rr=16.0,
         spo2=98.5,
-        stress=14.3,
+        stress=lf_hf_ratio,
         bp=120.75,
         sbp=120.0,
         dbp=80.0,
