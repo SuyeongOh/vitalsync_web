@@ -1,13 +1,15 @@
-from typing import List, Optional
-from fastapi import FastAPI, HTTPException, status
-from pydantic import BaseModel
-from vital.pipeline_package import preprocess_pipeline
-from vital.core import pos#, omit
-from vital.analysis.vital_calculator import VitalCalculator
-from vital.analysis.visualizer import *
+import asyncio
 from datetime import datetime
+from typing import List, Optional
 
 import numpy as np
+from fastapi import FastAPI, HTTPException, status
+from pydantic import BaseModel
+
+from vital.analysis.vital_calculator import VitalCalculator
+from vital.core import pos
+from vital.pipeline_package import preprocess_pipeline
+from vital.service import DataService
 
 vitalService = FastAPI()
 
@@ -32,16 +34,13 @@ class VitalResponse(BaseModel):
 
 @vitalService.post("/vital/all", response_model=VitalResponse)
 def calculate_vital(vital_request: VitalRequest):
-    # 여기에서 데이터를 처리하고 결과를 계산하는 로직을 구현합니다.
-    # 예제를 위해 임의의 값을 반환하겠습니다.
 
     if not vital_request.RGB:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid RGB data.")
 
-    # 계산된 결과를 반환합니다. 실제 애플리케이션에서는 계산 로직에 따라 결과가 달라질 것입니다.
     today = datetime.today().strftime("%Y%m%d")
     time = datetime.now().strftime("%H%M%S")
-    # preprocess RGB data
+    #preprocess RGB data
     RGB = np.asarray(vital_request.RGB).transpose(1, 0)
     RGB = preprocess_pipeline.apply(RGB)
 
@@ -71,6 +70,8 @@ def calculate_vital(vital_request: VitalRequest):
         status=200,
         message="Success"
     )
+
+    asyncio.run(DataService.saveData(vital_request.id, response))
     return response
 
 

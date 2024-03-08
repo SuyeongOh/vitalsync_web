@@ -1,4 +1,4 @@
-from server.vital.pipeline_package.base import SignalProcessingStep
+from vital.pipeline_package.base import SignalProcessingStep
 import numpy as np
 from scipy.signal import hilbert
 

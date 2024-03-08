@@ -1,4 +1,4 @@
-from server.vital.pipeline_package.base import SignalProcessingStep
+from vital.pipeline_package.base import SignalProcessingStep
 from scipy.signal import butter, filtfilt
 import numpy as np
 

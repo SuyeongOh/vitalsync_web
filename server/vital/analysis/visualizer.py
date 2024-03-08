@@ -1,6 +1,6 @@
 import matplotlib
 import matplotlib.pyplot as plt
-from server.vital.analysis.utils import *
+from vital.analysis.utils import *
 import scipy
 import os
 

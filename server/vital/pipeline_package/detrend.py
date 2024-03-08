@@ -1,6 +1,6 @@
 import numpy as np
 from scipy import sparse
-from server.vital.pipeline_package.base import SignalProcessingStep
+from vital.pipeline_package.base import SignalProcessingStep
 
 
 class Detrend(SignalProcessingStep):
