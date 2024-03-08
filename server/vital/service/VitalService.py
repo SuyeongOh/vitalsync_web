@@ -1,11 +1,13 @@
 from typing import List, Optional
 from fastapi import FastAPI, HTTPException, status
 from pydantic import BaseModel
-from server.vital.pipeline_package import preprocess_pipeline
-from server.vital.core import pos#, omit
-from server.vital.analysis.vital_calculator import VitalCalculator
-from server.vital.analysis.visualizer import *
+from vital.pipeline_package import preprocess_pipeline
+from vital.core import pos#, omit
+from vital.analysis.vital_calculator import VitalCalculator
+from vital.analysis.visualizer import *
 from datetime import datetime
+
+import numpy as np
 
 vitalService = FastAPI()
 
