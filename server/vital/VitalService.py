@@ -70,13 +70,16 @@ def calculate_vital(vital_request: VitalRequest):
     ibi_hr = vitalcalc.calc_ibi_hr()
     hrv = vitalcalc.calc_hrv()
     lf_hf_ratio = vitalcalc.calc_lfhf()
-    print(f"date: {today}, time: {time}, fft_hr: {fft_hr}, ibi_hr: {ibi_hr}, hrv: {hrv}, lf_hf_ratio: {lf_hf_ratio}")
+    spo2 = vitalcalc.calc_spo2(RGB)
+    print(f"date: {today}, time: {time}\n"
+          f"fft_hr: {fft_hr}, ibi_hr: {ibi_hr}, hrv: {hrv}\n"
+          f"lf_hf_ratio: {lf_hf_ratio}, spo2: {spo2}")
 
     response = VitalResponse(
         hr=fft_hr,
         hrv=hrv,
         rr=16.0,
-        spo2=98.5,
+        spo2=spo2,
         stress=lf_hf_ratio,
         bp=120.75,
         sbp=120.0,

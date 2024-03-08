@@ -1,7 +1,7 @@
 from .visualizer import *
 import numpy as np
 import scipy
-from server.vital.pipeline_package import heartrate_pipeline, lf_hf_pipeline, detrend
+from server.vital.pipeline_package import heartrate_pipeline, lf_hf_pipeline, detrend, bandpassfilter
 
 
 class VitalCalculator:
@@ -23,6 +23,9 @@ class VitalCalculator:
         self.save_dict['show_flag'] = False
         self.ppg_lf_hf = lf_hf_pipeline.apply(self.ppg, self.save_dict)
         self.lf_hf_ratio = 0
+
+        # SpO2 related
+        self.spo2 = 0
 
     # def visualize_ppg(self):
     #     bvp_fft_plot(self.ppg, self.fs, self.save_dict)
@@ -80,3 +83,18 @@ class VitalCalculator:
         # Calculate the LF/HF ratio
         lf_hf_ratio = lf_power / hf_power
         return lf_hf_ratio
+
+    def calc_spo2(self, RGB):
+        r_sig = bandpassfilter.BandpassFilter(filter_type="butterworth", fs=30, low=0.75, high=2.5, order=6).apply(RGB[:, 0])
+        b_sig = bandpassfilter.BandpassFilter(filter_type="butterworth", fs=30, low=0.75, high=2.5, order=6).apply(RGB[:, 2])
+
+        r_mean = np.mean(r_sig)
+        r_std = np.std(r_sig)
+
+        b_mean = np.mean(b_sig)
+        b_std = np.std(b_sig)
+
+        R = (r_std / r_mean) / (b_std / b_mean)
+
+        self.spo2 = 97.61 + 0.42 * R
+        return self.spo2

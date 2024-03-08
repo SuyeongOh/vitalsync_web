@@ -17,5 +17,5 @@ heartrate_pipeline = Pipeline(steps=[
 lf_hf_pipeline = Pipeline(steps=[
     # Detrend(),
     BandpassFilter(filter_type="butterworth", fs=30, low=0.04, high=0.4),
-    HilbertNormalization()
+    # HilbertNormalization()
 ])
