@@ -13,7 +13,7 @@ class VitalCalculator:
 
 
         # HR related
-        self.ppg_hr = heartrate_pipeline.apply(self.ppg)
+        self.ppg_hr = heartrate_pipeline.apply(self.ppg, save_dict)
         self.peaks = None
         self.ibis = None
         self.fft_hr = 0
@@ -25,7 +25,7 @@ class VitalCalculator:
         self.ppg_lf_hf = lf_hf_pipeline.apply(self.ppg, self.save_dict)
         self.lf_hf_ratio = 0
         # LF/HF related
-        self.ppg_lf_hf = lf_hf_pipeline.apply(self.ppg)
+        self.ppg_lf_hf = lf_hf_pipeline.apply(self.ppg, self.save_dict)
         self.lf_hf_ratio = 0
 
         # SpO2 related

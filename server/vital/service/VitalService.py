@@ -1,13 +1,13 @@
 from datetime import datetime
 
-import numpy as np
 from fastapi import FastAPI, HTTPException, status
 
 from server.vital.analysis.vital_calculator import VitalCalculator
-from server.vital.core import pos
+from server.vital.core import pos, omit
 from server.vital.pipeline_package import preprocess_pipeline
 from server.vital.service import DataService
 from server.vital.service.models import VitalRequest, VitalResponse
+from server.vital.analysis.visualizer import *
 
 vitalService = FastAPI()
 
