@@ -1,38 +1,19 @@
-from typing import List, Optional
-from fastapi import FastAPI, HTTPException, status
-from pydantic import BaseModel
-from pipeline_package import preprocess_pipeline
-from core import pos, omit
-from analysis.vital_calculator import VitalCalculator
-import numpy as np
-from analysis.visualizer import *
-vitalService = FastAPI()
 from datetime import datetime
 
+import numpy as np
+from fastapi import FastAPI, HTTPException, status
 
-class VitalRequest(BaseModel):
-    RGB: List[List[float]]
-    id: Optional[str] = None
+from server.vital.analysis.vital_calculator import VitalCalculator
+from server.vital.core import pos
+from server.vital.pipeline_package import preprocess_pipeline
+from server.vital.service import DataService
+from server.vital.service.models import VitalRequest, VitalResponse
 
-
-class VitalResponse(BaseModel):
-    hr: float = 0.0
-    hrv: float = 0.0
-    rr: float = 0.0
-    spo2: float = 0.0
-    stress: float = 0.0
-    bp: float = 0.0
-    sbp: float = 0.0
-    dbp: float = 0.0
-    status: int = 200
-    message: str = "Success"
+vitalService = FastAPI()
 
 
 @vitalService.post("/vital/all", response_model=VitalResponse)
-def calculate_vital(vital_request: VitalRequest):
-    # 여기에서 데이터를 처리하고 결과를 계산하는 로직을 구현합니다.
-    # 예제를 위해 임의의 값을 반환하겠습니다.
-
+async def calculate_vital(vital_request: VitalRequest):
     if not vital_request.RGB:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid RGB data.")
 
@@ -87,6 +68,9 @@ def calculate_vital(vital_request: VitalRequest):
         status=200,
         message="Success"
     )
+    await DataService.saveData(vital_request.id, response)
+    # asyncio.run(DataService.saveData(vital_request.id, response))
+
     return response
 
 

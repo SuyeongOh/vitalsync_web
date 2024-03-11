@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.ndimage import convolve
-from .base import SignalProcessingStep
+from server.vital.pipeline_package.base import SignalProcessingStep
 
 
 class Smooth(SignalProcessingStep):

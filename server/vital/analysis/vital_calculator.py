@@ -1,4 +1,4 @@
-from .visualizer import *
+from server.vital.analysis.visualizer import *
 import numpy as np
 import scipy
 from server.vital.pipeline_package import heartrate_pipeline, lf_hf_pipeline, detrend, bandpassfilter
@@ -11,8 +11,9 @@ class VitalCalculator:
         self.model = save_dict['model']
         self.save_dict = save_dict
 
+
         # HR related
-        self.ppg_hr = heartrate_pipeline.apply(self.ppg, self.save_dict)
+        self.ppg_hr = heartrate_pipeline.apply(self.ppg)
         self.peaks = None
         self.ibis = None
         self.fft_hr = 0
@@ -22,6 +23,9 @@ class VitalCalculator:
         # LF/HF related
         self.save_dict['show_flag'] = False
         self.ppg_lf_hf = lf_hf_pipeline.apply(self.ppg, self.save_dict)
+        self.lf_hf_ratio = 0
+        # LF/HF related
+        self.ppg_lf_hf = lf_hf_pipeline.apply(self.ppg)
         self.lf_hf_ratio = 0
 
         # SpO2 related
@@ -81,8 +85,8 @@ class VitalCalculator:
         hf_power = np.trapz(pxx[hf_indices], f[hf_indices])
 
         # Calculate the LF/HF ratio
-        lf_hf_ratio = lf_power / hf_power
-        return lf_hf_ratio
+        self.lf_hf_ratio = lf_power / hf_power
+        return self.lf_hf_ratio
 
     def calc_spo2(self, RGB):
         r_sig = bandpassfilter.BandpassFilter(filter_type="butterworth", fs=30, low=0.75, high=2.5, order=6).apply(RGB[:, 0])
