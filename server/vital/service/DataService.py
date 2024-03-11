@@ -3,7 +3,7 @@ import aiosqlite
 from datetime import datetime
 
 import server.vital
-from server.vital.service.VitalService import VitalResponse
+from server.vital.service.models import VitalResponse
 
 
 async def saveData(user: str, vitalResponse: VitalResponse):

@@ -10,31 +10,13 @@ from server.vital.analysis.vital_calculator import VitalCalculator
 from server.vital.core import pos
 from server.vital.pipeline_package import preprocess_pipeline
 from server.vital.service import DataService
+from server.vital.service.models import VitalRequest, VitalResponse
 
 vitalService = FastAPI()
 
 
-class VitalRequest(BaseModel):
-    RGB: List[List[float]]
-    id: Optional[str] = None
-
-
-class VitalResponse(BaseModel):
-    hr: float = 0.0
-    hrv: float = 0.0
-    rr: float = 0.0
-    spo2: float = 0.0
-    stress: float = 0.0
-    bp: float = 0.0
-    sbp: float = 0.0
-    dbp: float = 0.0
-    status: int = 200
-    message: str = "Success"
-
-
 @vitalService.post("/vital/all", response_model=VitalResponse)
 async def calculate_vital(vital_request: VitalRequest):
-
     if not vital_request.RGB:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid RGB data.")
 
