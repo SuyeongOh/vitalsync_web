@@ -1,10 +1,7 @@
-import asyncio
 from datetime import datetime
-from typing import List, Optional
 
 import numpy as np
 from fastapi import FastAPI, HTTPException, status
-from pydantic import BaseModel
 
 from server.vital.analysis.vital_calculator import VitalCalculator
 from server.vital.core import pos
