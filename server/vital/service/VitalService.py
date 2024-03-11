@@ -6,10 +6,10 @@ import numpy as np
 from fastapi import FastAPI, HTTPException, status
 from pydantic import BaseModel
 
-from vital.analysis.vital_calculator import VitalCalculator
-from vital.core import pos
-from vital.pipeline_package import preprocess_pipeline
-from vital.service import DataService
+from server.vital.analysis.vital_calculator import VitalCalculator
+from server.vital.core import pos
+from server.vital.pipeline_package import preprocess_pipeline
+from server.vital.service import DataService
 
 vitalService = FastAPI()
 
@@ -33,14 +33,14 @@ class VitalResponse(BaseModel):
 
 
 @vitalService.post("/vital/all", response_model=VitalResponse)
-def calculate_vital(vital_request: VitalRequest):
+async def calculate_vital(vital_request: VitalRequest):
 
     if not vital_request.RGB:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid RGB data.")
 
     today = datetime.today().strftime("%Y%m%d")
     time = datetime.now().strftime("%H%M%S")
-    #preprocess RGB data
+    # preprocess RGB data
     RGB = np.asarray(vital_request.RGB).transpose(1, 0)
     RGB = preprocess_pipeline.apply(RGB)
 
@@ -70,8 +70,9 @@ def calculate_vital(vital_request: VitalRequest):
         status=200,
         message="Success"
     )
+    await DataService.saveData(vital_request.id, response)
+    # asyncio.run(DataService.saveData(vital_request.id, response))
 
-    asyncio.run(DataService.saveData(vital_request.id, response))
     return response
 
 

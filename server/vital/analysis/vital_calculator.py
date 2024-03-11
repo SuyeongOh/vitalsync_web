@@ -1,7 +1,7 @@
-from vital.analysis.visualizer import *
+from server.vital.analysis.visualizer import *
 import numpy as np
 import scipy
-from vital.pipeline_package import heartrate_pipeline, lf_hf_pipeline, detrend, bandpassfilter
+from server.vital.pipeline_package import heartrate_pipeline, lf_hf_pipeline, detrend, bandpassfilter
 
 
 class VitalCalculator:
