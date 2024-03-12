@@ -16,6 +16,7 @@ class VitalCalculator:
         self.fft_hr = 0
         self.ibi_hr = 0
         self.hrv = 0
+        self.hrv_confidence = 0
 
         # LF/HF related
         self.ppg_lf_hf = lf_hf_pipeline.apply(self.ppg)
@@ -62,6 +63,12 @@ class VitalCalculator:
             self.calc_ibi_hr()
         self.hrv = np.std(self.ibis)
         return self.hrv
+
+    def calc_hrv_confidence(self):
+        # self.hrv_confidence = np.exp(-abs(self.fft_hr-self.ibi_hr)/(self.fft_hr+self.ibi_hr))
+        # self.hrv_confidence = 1 - abs(self.fft_hr - self.ibi_hr) / (self.fft_hr + self.ibi_hr)
+        self.hrv_confidence = np.exp(-abs(self.fft_hr - self.ibi_hr) / 20)
+        return self.hrv_confidence
 
     def calc_lfhf(self):
         low_frequency = (0.04, 0.15)
