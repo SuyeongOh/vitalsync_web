@@ -53,14 +53,15 @@ async def calculate_vital(vital_request: VitalRequest):
         message="Success"
     )
 
-    currentTime = DataService.get_current_time_str()
-    ppg_blob = vitalcalc.ppg.tobytes()
-    r = vital_request.RGB.pop(0)
-    g = vital_request.RGB.pop(0)
-    b = vital_request.RGB.pop(0)
-    await DataService.savePpgSignal(vital_request.id, ppg_blob, r, g, b, currentTime)
-    await DataService.saveData(vital_request.id, response, currentTime)
-    # asyncio.run(DataService.saveData(vital_request.id, response))
+    if not vital_request.id == "Guest":
+        currentTime = DataService.get_current_time_str()
+        ppg_blob = vitalcalc.ppg.tobytes()
+        r = vital_request.RGB.pop(0)
+        g = vital_request.RGB.pop(0)
+        b = vital_request.RGB.pop(0)
+        await DataService.savePpgSignal(vital_request.id, ppg_blob, r, g, b, currentTime)
+        await DataService.saveData(vital_request.id, response, currentTime)
+        # asyncio.run(DataService.saveData(vital_request.id, response))
 
     return response
 
