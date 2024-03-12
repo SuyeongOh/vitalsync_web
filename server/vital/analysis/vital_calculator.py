@@ -10,6 +10,7 @@ class VitalCalculator:
         self.fs = fs
         self.model = save_dict['model']
         self.save_dict = save_dict
+        self.visualize_ppg()
 
 
         # HR related
@@ -31,8 +32,8 @@ class VitalCalculator:
         # SpO2 related
         self.spo2 = 0
 
-    # def visualize_ppg(self):
-    #     bvp_fft_plot(self.ppg, self.fs, self.save_dict)
+    def visualize_ppg(self):
+        bvp_fft_plot(self.ppg, self.fs, self.save_dict)
     #
     # def visualize_rgb(self, rgb):
     #     rgb_plot(rgb, self.save_dict)

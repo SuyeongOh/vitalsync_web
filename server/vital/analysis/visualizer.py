@@ -52,9 +52,10 @@ def bvp_fft_plot(ppg, fs, save_dict=None):
         # Find pred freq signal peak
         fft_hr_pred = np.take(f_pred, np.argmax(pxx_pred)) * 60
 
-        # Plot peak of pred signal using fft_hr_pred
-        peaks_pred, _ = peak_detection(ppg=signal.squeeze(), fs=fs, bpmmin=45, bpmmax=150, windowsize=60/fft_hr_pred if fft_hr_pred > 0 else 0.75)
-        axs[0].plot(peaks_pred, signal.squeeze()[peaks_pred], "o", color='orange')
+        if save_dict['plot_peak']:
+            # Plot peak of pred signal using fft_hr_pred
+            peaks_pred, _ = peak_detection(ppg=signal.squeeze(), fs=fs, bpmmin=45, bpmmax=150, windowsize=60/fft_hr_pred if fft_hr_pred > 0 else 0.75)
+            axs[0].plot(peaks_pred, signal.squeeze()[peaks_pred], "o", color='orange')
 
         # Plot FFT of prediction and label
         axs[1].plot(f_pred * 60, pxx_pred, label=model_name, color='blue')

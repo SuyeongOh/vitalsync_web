@@ -19,7 +19,7 @@ async def calculate_vital(vital_request: VitalRequest):
 
     # 계산된 결과를 반환합니다. 실제 애플리케이션에서는 계산 로직에 따라 결과가 달라질 것입니다.
 
-    #여기다가 코드 구현해서 넣으면 된단다.
+    # 여기다가 코드 구현해서 넣으면 된단다.
     today = datetime.today().strftime("%Y%m%d")
     time = datetime.now().strftime("%H%M%S")
     save_dict = {'save_root_path': f'/home/najy/shared_innopia/test_results/{today}/',
@@ -44,6 +44,7 @@ async def calculate_vital(vital_request: VitalRequest):
     else:
         raise ValueError(f"Invalid model name: {save_dict['model']}")
     save_dict['show_flag'] = True
+    bvp_fft_plot(pred_ppg, 30, save_dict)
 
     # Calculate Vital
     vitalcalc = VitalCalculator(pred_ppg, 30, save_dict)
@@ -53,8 +54,9 @@ async def calculate_vital(vital_request: VitalRequest):
     lf_hf_ratio = vitalcalc.calc_lfhf()
     spo2 = vitalcalc.calc_spo2(RGB)
     print(f"date: {today}, time: {time}\n"
-          f"fft_hr: {fft_hr}, ibi_hr: {ibi_hr}, hrv: {hrv}\n"
-          f"lf_hf_ratio: {lf_hf_ratio}, spo2: {spo2}")
+          f"fft_hr: {fft_hr:.2f}, ibi_hr: {ibi_hr:.2f}, hrv: {hrv:.2f} "
+          f"hrv confidence: {np.exp(-abs(fft_hr - ibi_hr) / 20)*100:.2f}%\n"
+          f"lf_hf_ratio: {lf_hf_ratio:.2f}, spo2: {spo2:.2f}")
 
     response = VitalResponse(
         hr=fft_hr,
@@ -153,6 +155,7 @@ def calculate_stress(vital_request: VitalRequest):
     )
     return response
 
+
 @vitalService.post("/vital/bp", response_model=VitalResponse)
 def calculate_bp(vital_request: VitalRequest):
     if not vital_request.RGB:
@@ -173,4 +176,5 @@ def calculate_bp(vital_request: VitalRequest):
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(vitalService, host="0.0.0.0", port=1024)
