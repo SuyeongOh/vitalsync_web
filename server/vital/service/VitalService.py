@@ -41,6 +41,7 @@ async def calculate_vital(vital_request: VitalRequest):
 
     response = VitalResponse(
         hr=fft_hr,
+        ibi_hr=ibi_hr,
         hrv=hrv,
         rr=16.0,
         spo2=spo2,
@@ -53,7 +54,11 @@ async def calculate_vital(vital_request: VitalRequest):
     )
 
     currentTime = DataService.get_current_time_str()
-    await DataService.savePpgSignal(vital_request.id, vitalcalc.ppg, currentTime)
+    ppg_blob = vitalcalc.ppg.tobytes()
+    r = vital_request.RGB.pop(0)
+    g = vital_request.RGB.pop(0)
+    b = vital_request.RGB.pop(0)
+    await DataService.savePpgSignal(vital_request.id, ppg_blob, r, g, b, currentTime)
     await DataService.saveData(vital_request.id, response, currentTime)
     # asyncio.run(DataService.saveData(vital_request.id, response))
 

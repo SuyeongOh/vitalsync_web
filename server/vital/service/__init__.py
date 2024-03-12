@@ -1,10 +1,14 @@
 dataSaveQuery = '''INSERT INTO VitalSigns
-                  (UserID, hr, hrv, rr, spo2, stress, sbp, dbp, MeasurementTime)
-                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'''
+                  (UserID, hr, ibi_hr, hrv, rr, spo2, stress, sbp, dbp, MeasurementTime)
+                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'''
+
+dataLoadQuery = '''SELECT INTO VitalSigns WHERE UserID = ?'''
 
 signalSaveQuery = '''INSERT INTO VitalSignal
-                  (UserID, ppg, MeasurementTime)
-                  VALUES (?, ?, ?)'''
+                  (UserID, ppg, r_signal, g_signal, b_signal, MeasurementTime)
+                  VALUES (?, ?, ?, ?, ?, ?)'''
+
+signalLoadQuery = '''SELECT * FROM VitalSignal WHERE UserID = ?'''
 
 loginQuery = "SELECT * FROM users WHERE id = ? AND password = ?"
 
