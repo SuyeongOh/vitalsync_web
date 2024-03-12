@@ -46,7 +46,7 @@ async def savePpgSignal(user: str, ppg, currentTime: str):
         await db.execute("CREATE TABLE IF NOT EXISTS VitalSignal ("
                          "VitalSignalID INTEGER PRIMARY KEY,"
                          "UserID TEXT,"
-                         "ppg BLOB"
+                         "ppg BLOB,"
                          "MeasurementTime VARCHAR(12),"
                          "FOREIGN KEY (UserID) REFERENCES users(user_id)"
                          ")")
