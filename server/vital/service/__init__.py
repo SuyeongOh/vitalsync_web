@@ -5,7 +5,7 @@ dataSaveQuery = '''INSERT INTO VitalSigns
 dataLoadQuery = '''SELECT INTO VitalSigns WHERE UserID = ?'''
 
 signalSaveQuery = '''INSERT INTO VitalSignal
-                  (UserID, ppg, r, g, b, MeasurementTime)
+                  (UserID, ppg, r_signal, g_signal, b_signal, MeasurementTime)
                   VALUES (?, ?, ?, ?, ?, ?)'''
 
 signalLoadQuery = '''SELECT * FROM VitalSignal WHERE UserID = ?'''
