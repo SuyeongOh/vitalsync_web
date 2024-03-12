@@ -52,7 +52,7 @@ async def savePpgSignal(user: str, ppg, currentTime: str):
                          ")")
 
         # 사용자 추가
-        await db.execute(server.vital.service.dataSaveQuery, (
+        await db.execute(server.vital.service.signalSaveQuery, (
             user,
             ppg,
             currentTime
