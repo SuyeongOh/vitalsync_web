@@ -51,7 +51,10 @@ async def calculate_vital(vital_request: VitalRequest):
         status=200,
         message="Success"
     )
-    await DataService.saveData(vital_request.id, response)
+
+    currentTime = DataService.get_current_time_str()
+    await DataService.savePpgSignal(vital_request.id, vitalcalc.ppg, currentTime)
+    await DataService.saveData(vital_request.id, response, currentTime)
     # asyncio.run(DataService.saveData(vital_request.id, response))
 
     return response

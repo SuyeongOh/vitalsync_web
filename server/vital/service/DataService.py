@@ -6,7 +6,7 @@ import server.vital
 from server.vital.service.models import VitalResponse
 
 
-async def saveData(user: str, vitalResponse: VitalResponse):
+async def saveData(user: str, vitalResponse: VitalResponse, currentTime: str):
     async with aiosqlite.connect(server.vital.DATA_DB_NAME) as db:
         await db.execute("CREATE TABLE IF NOT EXISTS VitalSigns ("
                          "VitalSignID INTEGER PRIMARY KEY,"
@@ -33,7 +33,29 @@ async def saveData(user: str, vitalResponse: VitalResponse):
             vitalResponse.stress,
             vitalResponse.sbp,
             vitalResponse.dbp,
-            get_current_time_str()
+            currentTime
+        ))
+
+        # 변경 사항 저장
+        await db.commit()
+
+
+# ppg : ndarray
+async def savePpgSignal(user: str, ppg, currentTime: str):
+    async with aiosqlite.connect(server.vital.PPG_DB_NAME) as db:
+        await db.execute("CREATE TABLE IF NOT EXISTS VitalSignal ("
+                         "VitalSignalID INTEGER PRIMARY KEY,"
+                         "UserID TEXT,"
+                         "ppg BLOB"
+                         "MeasurementTime VARCHAR(12),"
+                         "FOREIGN KEY (UserID) REFERENCES users(user_id)"
+                         ")")
+
+        # 사용자 추가
+        await db.execute(server.vital.service.dataSaveQuery, (
+            user,
+            ppg,
+            currentTime
         ))
 
         # 변경 사항 저장
