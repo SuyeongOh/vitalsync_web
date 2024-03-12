@@ -2,7 +2,8 @@
 
 ## 사용 명령
   - `cd vitalsync_web`
-  - `uvicorn server.vital.VitalService:vitalService --host 0.0.0.0 --port 1024`
+  - `uvicorn server.vital.service.VitalService:vitalService --host 0.0.0.0 --port 1024 --reload`
+  - `uvicorn server.vital.service.UserService:userService --host 0.0.0.0 --port 1025 --reload`
 
 - android에서 baseurl 세팅 후 사용
 
