@@ -1,0 +1,9 @@
+<changelist name="Uncommitted_changes_before_Checkout_at_24__3__12__오전_11_07_[Changes]" date="1710209272238" recycled="true" deleted="true">
+  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_24__3__12__오전_11_07_[Changes]/shelved.patch" />
+  <option name="DESCRIPTION" value="Uncommitted changes before Checkout at 24. 3. 12. 오전 11:07 [Changes]" />
+  <binary>
+    <option name="BEFORE_PATH" value="server/vital/service/health_data.db" />
+    <option name="AFTER_PATH" value="server/vital/service/health_data.db" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_24__3__12__오전_11_07_[Changes]/health_data.db" />
+  </binary>
+</changelist>
