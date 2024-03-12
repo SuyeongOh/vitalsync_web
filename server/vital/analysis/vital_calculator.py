@@ -65,8 +65,6 @@ class VitalCalculator:
         return self.hrv
 
     def calc_hrv_confidence(self):
-        # self.hrv_confidence = np.exp(-abs(self.fft_hr-self.ibi_hr)/(self.fft_hr+self.ibi_hr))
-        # self.hrv_confidence = 1 - abs(self.fft_hr - self.ibi_hr) / (self.fft_hr + self.ibi_hr)
         self.hrv_confidence = np.exp(-abs(self.fft_hr - self.ibi_hr) / 20)
         return self.hrv_confidence
 
