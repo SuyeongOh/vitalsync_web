@@ -1,2 +1,9 @@
 server/users.db
 server/vital/service/health_data.db
+server/.idea/inspectionProfiles/
+server/vital/__pycache__/
+server/vital/analysis/__pycache__/
+server/vital/core/__pycache__/
+server/vital/pipeline_package/__pycache__/
+server/vital/service/__pycache__/
+./.idea
