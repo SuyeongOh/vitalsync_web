@@ -1,3 +1,6 @@
 server/users.db
 server/vital/service/health_data.db
 server/.idea
+/.idea/.gitignore
+/server/vital/service/health_ppg.db
+/.idea/misc.xml
