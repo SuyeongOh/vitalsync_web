@@ -51,15 +51,17 @@ async def calculate_vital(vital_request: VitalRequest):
     fft_hr = vitalcalc.calc_fft_hr()
     ibi_hr = vitalcalc.calc_ibi_hr()
     hrv = vitalcalc.calc_hrv()
+    hrv_confidence = vitalcalc.calc_hrv_confidence()
     lf_hf_ratio = vitalcalc.calc_lfhf()
     spo2 = vitalcalc.calc_spo2(RGB)
     print(f"date: {today}, time: {time}\n"
-          f"fft_hr: {fft_hr:.2f}, ibi_hr: {ibi_hr:.2f}, hrv: {hrv:.2f} "
-          f"hrv confidence: {np.exp(-abs(fft_hr - ibi_hr) / 20)*100:.2f}%\n"
+          f"fft_hr: {fft_hr:.2f}, ibi_hr: {ibi_hr:.2f}, hrv: {hrv:.2f}\n"
+          f"hrv confidence: {hrv_confidence*100:.2f}%\n"
           f"lf_hf_ratio: {lf_hf_ratio:.2f}, spo2: {spo2:.2f}")
 
     response = VitalResponse(
         hr=fft_hr,
+        ibi_hr=ibi_hr,
         hrv=hrv,
         rr=16.0,
         spo2=spo2,

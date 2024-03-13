@@ -9,6 +9,7 @@ class VitalRequest(BaseModel):
 
 class VitalResponse(BaseModel):
     hr: float = 0.0
+    ibi_hr: float = 0.0
     hrv: float = 0.0
     rr: float = 0.0
     spo2: float = 0.0
