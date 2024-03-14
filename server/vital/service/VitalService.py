@@ -7,7 +7,8 @@ from server.vital.analysis.vital_calculator import VitalCalculator
 from server.vital.core import pos
 from server.vital.pipeline_package import preprocess_pipeline
 from server.vital.service import DataService
-from server.vital.service.models import VitalRequest, VitalResponse
+from server.vital.db.vital import VitalRequest, VitalResponse
+from server.vital.db.ground_truth import GtResponse, GtRequest
 
 vitalService = FastAPI()
 
@@ -36,7 +37,7 @@ async def calculate_vital(vital_request: VitalRequest):
     spo2 = vitalcalc.calc_spo2(RGB)
     print(f"date: {today}, time: {time}\n"
           f"fft_hr: {fft_hr:.2f}, ibi_hr: {ibi_hr:.2f}, hrv: {hrv:.2f}\n"
-          f"hrv confidence: {hrv_confidence*100:.2f}%\n"
+          f"hrv confidence: {hrv_confidence * 100:.2f}%\n"
           f"lf_hf_ratio: {lf_hf_ratio:.2f}, spo2: {spo2:.2f}")
 
     response = VitalResponse(
@@ -53,13 +54,14 @@ async def calculate_vital(vital_request: VitalRequest):
         message="Success"
     )
 
-    currentTime = DataService.get_current_time_str()
+    currentTime = vital_request.measureTime
     ppg_blob = vitalcalc.ppg.tobytes()
     r = vital_request.RGB.pop(0)
     g = vital_request.RGB.pop(0)
     b = vital_request.RGB.pop(0)
     await DataService.savePpgSignal(vital_request.id, ppg_blob, r, g, b, currentTime)
     await DataService.saveData(vital_request.id, response, currentTime)
+    # saveGTdata
     # asyncio.run(DataService.saveData(vital_request.id, response))
 
     return response
@@ -161,6 +163,10 @@ def calculate_bp(vital_request: VitalRequest):
         message="Success"
     )
     return response
+
+
+@vitalService.post("/vital/gt", response_model=GtResponse)
+def postGT(gr_request: GtRequest):
 
 
 if __name__ == "__main__":
