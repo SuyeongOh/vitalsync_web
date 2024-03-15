@@ -10,7 +10,7 @@ class GtRequest(BaseModel):
     stress: float = 0.0
     sbp: float = 0.0
     dbp: float = 0.0
-    measureTime = "0"
+    measureTime: str = "0"
     id: Optional[str] = None
 
 
