@@ -40,3 +40,5 @@ async def register(user: User):
     # 변경 사항 저장하고 연결 종료
     conn.commit()
     conn.close()
+
+    return {"message": "register successful"}
