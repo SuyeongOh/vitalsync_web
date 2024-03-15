@@ -24,7 +24,7 @@ async def saveData(user: str, vitalResponse: VitalResponse, currentTime: str):
                          "bp DOUBLE,"
                          "sbp DOUBLE,"
                          "dbp DOUBLE,"
-                         "MeasurementTime VARCHAR(12),"
+                         "MeasurementTime VARCHAR(14),"
                          "FOREIGN KEY (UserID) REFERENCES users(user_id)"
                          ")")
 
@@ -64,7 +64,7 @@ async def savePpgSignal(user: str, ppg, r: list[float], g: list[float], b: list[
                          "r_signal BLOB,"
                          "g_signal BLOB,"
                          "b_signal BLOB,"
-                         "MeasurementTime VARCHAR(12),"
+                         "MeasurementTime VARCHAR(14),"
                          "FOREIGN KEY (UserID) REFERENCES users(user_id)"
                          ")")
 
@@ -103,7 +103,7 @@ async def saveGt(ground_truth: GtRequest):
                          "stress DOUBLE,"
                          "sbp DOUBLE,"
                          "dbp DOUBLE,"
-                         "MeasurementTime VARCHAR(12),"
+                         "MeasurementTime VARCHAR(14),"
                          "FOREIGN KEY (UserID) REFERENCES users(user_id)"
                          ")")
 
