@@ -6,6 +6,7 @@ import numpy as np
 from datetime import datetime
 
 import server.vital
+from server.vital.db.ground_truth import GtRequest
 from server.vital.db.vital import VitalResponse
 
 
@@ -55,7 +56,7 @@ async def getData(user: str):
 
 # ppg : ndarray
 async def savePpgSignal(user: str, ppg, r: list[float], g: list[float], b: list[float], currentTime: str):
-    async with aiosqlite.connect(server.vital.PPG_DB_NAME) as db:
+    async with aiosqlite.connect(server.vital.DATA_DB_NAME) as db:
         await db.execute("CREATE TABLE IF NOT EXISTS VitalSignal ("
                          "VitalSignalID INTEGER PRIMARY KEY,"
                          "UserID TEXT,"
@@ -82,7 +83,7 @@ async def savePpgSignal(user: str, ppg, r: list[float], g: list[float], b: list[
 
 
 async def getPpgSignal(user: str):
-    async with aiosqlite.connect(server.vital.PPG_DB_NAME) as db:
+    async with aiosqlite.connect(server.vital.DATA_DB_NAME) as db:
         cursor = await db.cursor()
         await db.execute(server.vital.service.signalLoadQuery, (user,))
         data = await cursor.fetchall()
@@ -90,10 +91,10 @@ async def getPpgSignal(user: str):
         return data
 
 
-async def saveGt(user: str, ppg, r: list[float], g: list[float], b: list[float], currentTime: str):
-    async with aiosqlite.connect(server.vital.PPG_DB_NAME) as db:
-        await db.execute("CREATE TABLE IF NOT EXISTS VitalSignal ("
-                         "VitalSignalID INTEGER PRIMARY KEY,"
+async def saveGt(ground_truth: GtRequest):
+    async with aiosqlite.connect(server.vital.DATA_DB_NAME) as db:
+        await db.execute("CREATE TABLE IF NOT EXISTS GroundTruth ("
+                         "GroundTruthID INTEGER PRIMARY KEY,"
                          "UserID TEXT,"
                          "hr DOUBLE,"
                          "hrv DOUBLE,"
@@ -107,13 +108,16 @@ async def saveGt(user: str, ppg, r: list[float], g: list[float], b: list[float],
                          ")")
 
         # 사용자 추가
-        await db.execute(server.vital.service.signalSaveQuery, (
-            user,
-            ppg,
-            pickle.dumps(r),
-            pickle.dumps(g),
-            pickle.dumps(b),
-            currentTime
+        await db.execute(server.vital.service.gtSaveQuery, (
+            ground_truth.id,
+            ground_truth.hr,
+            ground_truth.hrv,
+            ground_truth.rr,
+            ground_truth.spo2,
+            ground_truth.stress,
+            ground_truth.sbp,
+            ground_truth.dbp,
+            ground_truth.measureTime
         ))
 
         # 변경 사항 저장
@@ -121,9 +125,9 @@ async def saveGt(user: str, ppg, r: list[float], g: list[float], b: list[float],
 
 
 async def getGt(user: str):
-    async with aiosqlite.connect(server.vital.PPG_DB_NAME) as db:
+    async with aiosqlite.connect(server.vital.DATA_DB_NAME) as db:
         cursor = await db.cursor()
-        await db.execute(server.vital.service.signalLoadQuery, (user,))
+        await db.execute(server.vital.service.gtLoadQuery, (user,))
         data = await cursor.fetchall()
 
         return data

@@ -166,8 +166,8 @@ def calculate_bp(vital_request: VitalRequest):
 
 
 @vitalService.post("/vital/gt", response_model=GtResponse)
-def postGT(gr_request: GtRequest):
-
+def postGT(gt_request: GtRequest):
+    DataService.saveGt(gt_request)
 
 if __name__ == "__main__":
     import uvicorn
