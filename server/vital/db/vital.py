@@ -5,7 +5,7 @@ from typing import List, Optional
 class VitalRequest(BaseModel):
     RGB: List[List[float]]
     id: Optional[str] = None
-    measureTime = 0
+    measureTime = ""
 
 class VitalResponse(BaseModel):
     hr: float = 0.0
