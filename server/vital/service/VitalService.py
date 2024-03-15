@@ -5,9 +5,10 @@ from fastapi import FastAPI, HTTPException, status
 
 from server.vital.analysis.vital_calculator import VitalCalculator
 from server.vital.core import pos
+from server.vital.db.ground_truth import GtResponse, GtRequest
+from server.vital.db.vital import VitalRequest, VitalResponse
 from server.vital.pipeline_package import preprocess_pipeline
 from server.vital.service import DataService
-from server.vital.service.models import VitalRequest, VitalResponse
 
 vitalService = FastAPI()
 
@@ -52,15 +53,15 @@ async def calculate_vital(vital_request: VitalRequest):
         status=200,
         message="Success"
     )
-
     if not vital_request.id == "Guest":
-        currentTime = DataService.get_current_time_str()
+        currentTime = vital_request.measureTime
         ppg_blob = vitalcalc.ppg.tobytes()
         r = vital_request.RGB.pop(0)
         g = vital_request.RGB.pop(0)
         b = vital_request.RGB.pop(0)
         await DataService.savePpgSignal(vital_request.id, ppg_blob, r, g, b, currentTime)
         await DataService.saveData(vital_request.id, response, currentTime)
+        # saveGTdata
         # asyncio.run(DataService.saveData(vital_request.id, response))
 
     return response
@@ -163,6 +164,10 @@ def calculate_bp(vital_request: VitalRequest):
     )
     return response
 
+
+@vitalService.post("/vital/gt", response_model=GtResponse)
+def postGT(gt_request: GtRequest):
+    DataService.saveGt(gt_request)
 
 if __name__ == "__main__":
     import uvicorn
