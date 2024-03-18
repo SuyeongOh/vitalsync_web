@@ -3,7 +3,7 @@ from datetime import datetime
 from fastapi import FastAPI, HTTPException, status
 
 from server.vital.analysis.vital_calculator import VitalCalculator
-from server.vital.core import pos, omit
+from server.vital.core.ppg import pos, omit
 from server.vital.pipeline_package import preprocess_pipeline
 from server.vital.service import DataService
 from server.vital.service.models import VitalRequest, VitalResponse
