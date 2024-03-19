@@ -9,3 +9,4 @@ server/vital/service/__pycache__/
 ./.idea
 /server/vital/service/health_ppg.db
 /server/.idea/
+/server/vital/core/bp/
