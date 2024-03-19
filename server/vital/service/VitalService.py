@@ -36,7 +36,7 @@ async def calculate_vital(vital_request: VitalRequest):
     hrv_confidence = vitalcalc.calc_hrv_confidence()
     lf_hf_ratio = vitalcalc.calc_lfhf()
     spo2 = vitalcalc.calc_spo2(RGB)
-    print(f"date: {today}, time: {time}\n"
+    print(f"date: {vital_request.measureTime}\n"
           f"fft_hr: {fft_hr:.2f}, ibi_hr: {ibi_hr:.2f}, hrv: {hrv:.2f}\n"
           f"hrv confidence: {hrv_confidence*100:.2f}%\n"
           f"lf_hf_ratio: {lf_hf_ratio:.2f}, spo2: {spo2:.2f}")

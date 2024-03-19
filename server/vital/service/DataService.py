@@ -32,10 +32,12 @@ async def saveData(user: str, vitalResponse: VitalResponse, currentTime: str):
         await db.execute(server.vital.service.dataSaveQuery, (
             user,
             vitalResponse.hr,
+            vitalResponse.ibi_hr,
             vitalResponse.hrv,
             vitalResponse.rr,
             vitalResponse.spo2,
             vitalResponse.stress,
+            vitalResponse.bp,
             vitalResponse.sbp,
             vitalResponse.dbp,
             currentTime
