@@ -1,7 +1,7 @@
 from server.vital.analysis.visualizer import *
 import numpy as np
 import scipy
-from server.vital.pipeline_package import heartrate_pipeline, lf_hf_pipeline, detrend, bandpassfilter
+from server.vital.pipeline_package import *
 
 
 class VitalCalculator:
@@ -10,7 +10,8 @@ class VitalCalculator:
         self.fs = fs
 
         # HR related
-        self.ppg_hr = heartrate_pipeline.apply(self.ppg)
+        self.bpf_ppg = heartrate_pipeline.apply(self.ppg)
+        self.hilbert_ppg = fft_hr_pipeline.apply(self.bpf_ppg)
         self.peaks = None
         self.ibis = None
         self.fft_hr = 0
@@ -25,14 +26,8 @@ class VitalCalculator:
         # SpO2 related
         self.spo2 = 0
 
-    # def visualize_ppg(self):
-    #     bvp_fft_plot(self.ppg, self.fs, self.save_dict)
-    #
-    # def visualize_rgb(self, rgb):
-    #     rgb_plot(rgb, self.save_dict)
-
     def calc_fft_hr(self):
-        signal = np.expand_dims(self.ppg_hr, 0)
+        signal = np.expand_dims(self.hilbert_ppg, 0)
         N = next_power_of_2(signal.shape[1])
         f_ppg, pxx_ppg = scipy.signal.periodogram(signal, fs=self.fs, nfft=N, detrend=False)
         pxx_ppg = pxx_ppg.squeeze()
@@ -50,10 +45,8 @@ class VitalCalculator:
         return masked_fft_hr_ppg
 
     def calc_ibi_hr(self):
-        self.peaks, _ = peak_detection(self.ppg_hr, self.fs, 45, 150,
-                                               windowsize=60 / self.fft_hr if self.fft_hr > 0 else 0.75)
-        self.peaks = [peak for peak in self.peaks if self.ppg_hr[peak] > 0.8]
-        self.ibis = np.diff(self.peaks) / self.fs * 1000
+        self.peaks, self.ibis = peak_detection(self.bpf_ppg, self.fs, 45, 150,
+                                       windowsize=60 / self.fft_hr if self.fft_hr > 0 else 0.75)
         hr_list = np.divide(60000, self.ibis)
         self.ibi_hr = np.mean(hr_list)
         return self.ibi_hr
