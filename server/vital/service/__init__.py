@@ -1,6 +1,6 @@
 dataSaveQuery = '''INSERT INTO VitalSigns
-                  (UserID, hr, ibi_hr, hrv, rr, spo2, stress, sbp, dbp, MeasurementTime)
-                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'''
+                  (UserID, hr, ibi_hr, hrv, rr, spo2, stress, bp, sbp, dbp, MeasurementTime)
+                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'''
 
 dataLoadQuery = '''SELECT INTO VitalSigns WHERE UserID = ?'''
 

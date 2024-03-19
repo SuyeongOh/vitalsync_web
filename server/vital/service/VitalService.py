@@ -60,8 +60,8 @@ async def calculate_vital(vital_request: VitalRequest):
         r = vital_request.RGB.pop(0)
         g = vital_request.RGB.pop(0)
         b = vital_request.RGB.pop(0)
-        asyncio.create_task(DataService.savePpgSignal(vital_request.id, ppg_blob, r, g, b, currentTime))
-        asyncio.create_task(DataService.saveData(vital_request.id, response, currentTime))
+        await asyncio.create_task(DataService.savePpgSignal(vital_request.id, ppg_blob, r, g, b, currentTime))
+        await asyncio.create_task(DataService.saveData(vital_request.id, response, currentTime))
         # saveGTdata
         # asyncio.run(DataService.saveData(vital_request.id, response))
 
