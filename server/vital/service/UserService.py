@@ -15,7 +15,7 @@ async def login(user_id: str):
     try:
         cursor.execute(server.vital.service.loginQuery, (user_id, password))
     except:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect id or password")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Error LoginQuery")
     user_in_db = cursor.fetchone()
     conn.close()
     if user_in_db:
@@ -40,3 +40,5 @@ async def register(user: User):
     # 변경 사항 저장하고 연결 종료
     conn.commit()
     conn.close()
+
+    return {"message": "register successful"}

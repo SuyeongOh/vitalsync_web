@@ -2,15 +2,7 @@ from matplotlib import pyplot as plt
 import os
 import scipy
 import numpy as np
-from heartpy.datautils import rolling_mean
-from heartpy.peakdetection import fit_peaks
-
-
-def peak_detection(ppg, fs, bpmmin=45, bpmmax=150, windowsize=0.75):
-    rol_mean = rolling_mean(ppg, windowsize, fs)
-    wd = fit_peaks(ppg, rol_mean, fs, bpmmin, bpmmax)
-
-    return wd['peaklist'], wd['RR_list']
+from server.vital.analysis.utils import peak_detection
 
 
 class SignalProcessingStep:
@@ -63,10 +55,10 @@ class SignalProcessingStep:
 
             if save_dict['plot_peak']:
                 # Plot peak of pred signal using fft_hr_pred
-                peaks_pred, _ = peak_detection(ppg=signal.squeeze(), fs=fs, bpmmin=45, bpmmax=150,
-                                               windowsize=60 / fft_hr_pred if fft_hr_pred > 0 else 0.75)
+                peaks_pred, ibis = peak_detection(ppg=signal.squeeze(), fs=fs, bpmmin=45, bpmmax=150,
+                                                  windowsize=60 / fft_hr_pred if fft_hr_pred > 0 else 0.75)
                 peaks_filtered = [peak for peak in peaks_pred if signal.squeeze()[peak] > 0.8]
-                ibis = np.diff(peaks_pred) / fs * 1000
+                # ibis = np.diff(peaks_pred) / fs * 1000
                 hr_list = np.divide(60000, ibis)
                 ibi_hr = np.mean(hr_list)
                 hrv = np.std(ibis)
