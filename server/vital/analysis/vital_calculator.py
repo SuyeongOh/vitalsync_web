@@ -26,6 +26,10 @@ class VitalCalculator:
         # SpO2 related
         self.spo2 = 0
 
+        # BP related
+        self.sbp = 0
+        self.dbp = 0
+
     def calc_fft_hr(self):
         signal = np.expand_dims(self.hilbert_ppg, 0)
         N = next_power_of_2(signal.shape[1])
@@ -95,3 +99,23 @@ class VitalCalculator:
 
         self.spo2 = 97.61 + 0.42 * R
         return self.spo2
+
+    def calc_bp(self, height, weight, age, gender):
+        Q = 5 if gender == 'male' else 4.5
+        # Resistivity of blood
+        ROB = 18.31
+        # Ejection Time
+        ET = (364.5 - 1.23 * self.fft_hr)
+        # Body Surface Area
+        BSA = 0.007184 * (weight ** 0.425) * (height ** 0.725)
+        # Stroke volume
+        SV = (-6.6 + (0.25 * (ET - 35)) - (0.62 * self.fft_hr) + (40.4 * BSA) - (0.51 * age))
+        # Pulse Pressure
+        PP = SV / ((0.013 * weight - 0.007 * age - 0.004 * self.fft_hr) + 1.307)
+
+        MAP = Q * ROB
+
+        self.sbp = int(MAP + 3 / 2 * PP)
+        self.dbp = int(MAP - PP / 3)
+
+        return self.sbp, self.dbp

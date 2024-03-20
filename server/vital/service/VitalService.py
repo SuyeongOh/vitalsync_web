@@ -14,14 +14,12 @@ from server.vital.service import DataService
 vitalService = FastAPI()
 
 
-#gender : male-남자, female-여자
+# gender : male-남자, female-여자
 @vitalService.post("/vital/all", response_model=VitalResponse)
 async def calculate_vital(vital_request: VitalRequest):
     if not vital_request.RGB:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid RGB data.")
 
-    today = datetime.today().strftime("%Y%m%d")
-    time = datetime.now().strftime("%H%M%S")
     # preprocess RGB data
     RGB = np.asarray(vital_request.RGB).transpose(1, 0)
     RGB = preprocess_pipeline.apply(RGB)
@@ -37,11 +35,13 @@ async def calculate_vital(vital_request: VitalRequest):
     hrv_confidence = vitalcalc.calc_hrv_confidence()
     lf_hf_ratio = vitalcalc.calc_lfhf()
     spo2 = vitalcalc.calc_spo2(RGB)
+    sbp, dbp = vitalcalc.calc_bp(vital_request.height, vital_request.weight, vital_request.age, vital_request.gender)
     print(f"date: {vital_request.measureTime}\n"
           f"fft_hr: {fft_hr:.2f}, ibi_hr: {ibi_hr:.2f}, hrv: {hrv:.2f}\n"
-          f"hrv confidence: {hrv_confidence*100:.2f}%\n"
+          f"hrv confidence: {hrv_confidence * 100:.2f}%\n"
           f"lf_hf_ratio: {lf_hf_ratio:.2f}, spo2: {spo2:.2f}\n"
-          f"gender: {vital_request.gender}")
+          f"gender: {vital_request.gender}, age: {vital_request.age}, height: {vital_request.height}, weight: {vital_request.weight}\n"
+          f"sbp: {sbp:.2f}, dbp: {dbp:.2f}, bp: {sbp*0.33 + dbp*0.66:.2f}")
 
     response = VitalResponse(
         hr=fft_hr,
@@ -50,9 +50,9 @@ async def calculate_vital(vital_request: VitalRequest):
         rr=16.0,
         spo2=spo2,
         stress=lf_hf_ratio,
-        bp=120.75,
-        sbp=120.0,
-        dbp=80.0,
+        bp=sbp*0.33 + dbp*0.66,
+        sbp=sbp,
+        dbp=dbp,
         status=200,
         message="Success"
     )
@@ -171,6 +171,7 @@ def calculate_bp(vital_request: VitalRequest):
 @vitalService.post("/vital/gt", response_model=GtResponse)
 def postGT(gt_request: GtRequest):
     DataService.saveGt(gt_request)
+
 
 if __name__ == "__main__":
     import uvicorn
