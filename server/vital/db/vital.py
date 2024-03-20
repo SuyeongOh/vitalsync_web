@@ -6,6 +6,8 @@ class VitalRequest(BaseModel):
     RGB: List[List[float]]
     age: int = 0
     bmi: float = 20.1
+    weight: float = 0
+    height: float = 0
     gender: str = "male"
     id: Optional[str] = None
     measureTime: str = "0"
