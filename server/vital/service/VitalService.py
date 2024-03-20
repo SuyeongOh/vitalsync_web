@@ -14,6 +14,7 @@ from server.vital.service import DataService
 vitalService = FastAPI()
 
 
+#gender : male-남자, female-여자
 @vitalService.post("/vital/all", response_model=VitalResponse)
 async def calculate_vital(vital_request: VitalRequest):
     if not vital_request.RGB:
@@ -39,7 +40,8 @@ async def calculate_vital(vital_request: VitalRequest):
     print(f"date: {vital_request.measureTime}\n"
           f"fft_hr: {fft_hr:.2f}, ibi_hr: {ibi_hr:.2f}, hrv: {hrv:.2f}\n"
           f"hrv confidence: {hrv_confidence*100:.2f}%\n"
-          f"lf_hf_ratio: {lf_hf_ratio:.2f}, spo2: {spo2:.2f}")
+          f"lf_hf_ratio: {lf_hf_ratio:.2f}, spo2: {spo2:.2f}\n"
+          f"gender: {vital_request.gender}")
 
     response = VitalResponse(
         hr=fft_hr,

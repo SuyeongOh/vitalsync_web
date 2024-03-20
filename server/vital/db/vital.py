@@ -4,6 +4,9 @@ from typing import List, Optional
 
 class VitalRequest(BaseModel):
     RGB: List[List[float]]
+    age: int = 0
+    bmi: float = 20.1
+    gender: str = "male"
     id: Optional[str] = None
     measureTime: str = "0"
 
