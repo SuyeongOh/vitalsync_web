@@ -6,7 +6,7 @@ server/vital/analysis/__pycache__/
 server/vital/core/__pycache__/
 server/vital/pipeline_package/__pycache__/
 server/vital/service/__pycache__/
-./.idea
+/.idea
 /server/vital/service/health_ppg.db
 /server/.idea/
 /server/vital/core/bp/
