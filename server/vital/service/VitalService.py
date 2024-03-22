@@ -170,7 +170,8 @@ def calculate_bp(vital_request: VitalRequest):
 
 @vitalService.post("/vital/gt", response_model=GtResponse)
 def postGT(gt_request: GtRequest):
-    DataService.saveGt(gt_request)
+    response = DataService.saveGt(gt_request)
+    return response
 
 
 if __name__ == "__main__":

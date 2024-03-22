@@ -95,45 +95,45 @@ async def getPpgSignal(user: str):
 
 async def saveGt(ground_truth: GtRequest):
     try:
-        async with aiosqlite.connect(server.vital.DATA_DB_NAME) as db:
-            await db.execute("CREATE TABLE IF NOT EXISTS GroundTruth ("
-                             "GroundTruthID INTEGER PRIMARY KEY,"
-                             "UserID TEXT,"
-                             "hr DOUBLE,"
-                             "hrv DOUBLE,"
-                             "rr DOUBLE,"
-                             "spo2 DOUBLE,"
-                             "stress DOUBLE,"
-                             "sbp DOUBLE,"
-                             "dbp DOUBLE,"
-                             "MeasurementTime VARCHAR(14),"
-                             "FOREIGN KEY (UserID) REFERENCES users(user_id)"
-                             ")")
+        # SQLite 데이터베이스 연결
+        conn = sqlite3.connect(server.vital.DATA_DB_NAME)
+        cursor = conn.cursor()
 
-            # 사용자 추가
-            await db.execute(server.vital.service.gtSaveQuery, (
-                ground_truth.id,
-                ground_truth.hr,
-                ground_truth.hrv,
-                ground_truth.rr,
-                ground_truth.spo2,
-                ground_truth.stress,
-                ground_truth.sbp,
-                ground_truth.dbp,
-                ground_truth.measureTime
-            ))
+        # GroundTruth 테이블 생성
+        cursor.execute("CREATE TABLE IF NOT EXISTS GroundTruth ("
+                       "GroundTruthID INTEGER PRIMARY KEY,"
+                       "UserID TEXT,"
+                       "hr DOUBLE,"
+                       "hrv DOUBLE,"
+                       "rr DOUBLE,"
+                       "spo2 DOUBLE,"
+                       "stress DOUBLE,"
+                       "sbp DOUBLE,"
+                       "dbp DOUBLE,"
+                       "MeasurementTime VARCHAR(14),"
+                       "FOREIGN KEY (UserID) REFERENCES users(user_id)"
+                       ")")
 
-            # 변경 사항 저장
-            await db.commit()
+        # 데이터 삽입
+        cursor.execute("INSERT INTO GroundTruth (UserID, hr, hrv, rr, spo2, stress, sbp, dbp, MeasurementTime) "
+                       "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                       (ground_truth.id, ground_truth.hr, ground_truth.hrv, ground_truth.rr,
+                        ground_truth.spo2, ground_truth.stress, ground_truth.sbp, ground_truth.dbp,
+                        ground_truth.measureTime))
 
-            response = GtResponse()
-            response.status = 200
-            response.status = "save ground truth success"
-            return response
+        # 변경 사항 저장 및 연결 종료
+        conn.commit()
+        conn.close()
+        response = GtResponse()
+        response.status = 200
+        response.message = "saving ground truth success"
+        return response
+
     except:
         response = GtResponse()
         response.status = 500
-        response.status = "internal ground truth error"
+        response.message = "internal error saving ground truth "
+        return response
 
 
 async def getGt(user: str):
