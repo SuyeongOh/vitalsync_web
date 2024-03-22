@@ -60,7 +60,7 @@ async def getData(user_id: str):
     db.execute(server.vital.service.dataLoadQuery, (user_id,))
     data = cursor.fetchall()
 
-    return json.dumps(data)
+    return data
 
 
 @userService.get("/vital/data/signal")
@@ -70,7 +70,8 @@ async def getPpgSignal(user_id: str):
     db.execute(server.vital.service.signalLoadQuery, (user_id,))
     data = cursor.fetchall()
 
-    return json.dumps(data)
+    print(data)
+    return data
 
 
 @userService.get("/vital/data/gt")
@@ -80,4 +81,4 @@ def getGT(user_id: str):
     cursor.execute(gtLoadQuery, (user_id,))
     data = cursor.fetchall()
 
-    return json.dumps(data)
+    return data
