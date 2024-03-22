@@ -93,7 +93,7 @@ async def getPpgSignal(user: str):
         return data
 
 
-async def saveGt(ground_truth: GtRequest):
+def saveGt(ground_truth: GtRequest):
     try:
         # SQLite 데이터베이스 연결
         conn = sqlite3.connect(server.vital.DATA_DB_NAME)
