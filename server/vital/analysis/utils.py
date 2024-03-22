@@ -1,6 +1,7 @@
 from heartpy.datautils import rolling_mean
 from heartpy.peakdetection import fit_peaks, calc_rr, check_peaks
 import numpy as np
+from scipy.signal import butter, filtfilt, lfilter, hilbert, find_peaks
 
 
 def next_power_of_2(x):
@@ -16,4 +17,104 @@ def peak_detection(ppg, fs, bpmmin=45, bpmmax=150, windowsize=0.75):
     peaklist_cor = np.array(wd['peaklist'])[np.where(wd['binary_peaklist'])[0]]
 
     return peaklist_cor, wd['RR_list_cor']
+
+
+def BPF(input_val, fs=30, low=0.75, high=2.5):
+    low = low / (0.5 * fs)
+    high = high / (0.5 * fs)
+    [b_pulse, a_pulse] = butter(6, [low, high], btype='bandpass')
+    return filtfilt(b_pulse, a_pulse, np.double(input_val))
+
+
+def butter_lowpass_filter(data, fs, cutoff=0.7, order=1):
+    nyquist = 0.5 * fs
+    normal_cutoff = cutoff / nyquist
+    b, a = butter(order, normal_cutoff, btype='low', analog=False)
+    y = lfilter(b, a, data)
+    return y
+
+
+def calculate_envelopes(signal):
+    """
+    Calculate the upper and lower envelopes of a signal using Hilbert Transform.
+    """
+    analytic_signal = hilbert(signal)
+    upper_envelope = np.abs(analytic_signal)
+    lower_envelope = -np.abs(analytic_signal)
+    return upper_envelope, lower_envelope
+
+
+def calculate_peak_valley_distance(upper_envelope, lower_envelope):
+    """
+    Calculate the peak-valley distance from the upper and lower envelopes of the signal.
+    """
+    peak_valley_distance = np.median(upper_envelope - lower_envelope)
+    return peak_valley_distance
+
+
+def find_filtered_peaks(signal, dist=15):
+    p, _ = find_peaks(signal, distance=dist)
+    v, _ = find_peaks(-signal, distance=dist)
+
+    # valley가 앞에 있으면 valley peak 앞에서 하나씩 삭제
+    # peak가 앞에 있으면 peak 하나 삭제
+
+    peaks, valleys = filter_peaks_and_valleys(peaks=p, valleys=v, signal=signal)
+
+    if peaks[0] < valleys[0]:
+        peaks = peaks[2:]
+        valleys = valleys[1:]
+    else:
+        peaks = peaks[1:]
+        valleys = valleys[1:]
+
+    num_pair = min(len(peaks), len(valleys))
+    if len(valleys) > num_pair:
+        valleys = valleys[:num_pair]
+
+    return peaks, valleys
+
+
+def filter_peaks_and_valleys(peaks, valleys, signal):
+    filtered_peaks = []
+    filtered_valleys = []
+
+    # 모든 peaks와 valleys를 하나의 배열로 합치고, 정렬합니다.
+    all_points = np.sort(np.concatenate((peaks, valleys)))
+
+    # 첫 번째 peak 또는 valley부터 시작하여, 다음 peak 또는 valley 사이에서 조건을 확인합니다.
+    for i in range(len(all_points) - 1):
+        current_point = all_points[i]
+        next_point = all_points[i + 1]
+
+        # 현재 점이 peak일 경우
+        if current_point in peaks:
+            # 다음 점이 valley이고, 사이에 다른 점이 없으면, 현재 peak를 유지합니다.
+            if next_point in valleys and i + 2 < len(all_points) and all_points[i + 2] not in valleys:
+                filtered_peaks.append(current_point)
+            # 사이에 다른 peaks가 있는 경우, 최댓값을 찾아 필터링합니다.
+            elif next_point in valleys:
+                max_peak = signal[current_point]
+                max_peak_index = current_point
+                for j in range(current_point + 1, next_point):
+                    if j in peaks and signal[j] > max_peak:
+                        max_peak = signal[j]
+                        max_peak_index = j
+                filtered_peaks.append(max_peak_index)
+        # 현재 점이 valley일 경우
+        else:
+            # 다음 점이 peak이고, 사이에 다른 점이 없으면, 현재 valley를 유지합니다.
+            if next_point in peaks and i + 2 < len(all_points) and all_points[i + 2] not in peaks:
+                filtered_valleys.append(current_point)
+            # 사이에 다른 valleys가 있는 경우, 최솟값을 찾아 필터링합니다.
+            elif next_point in peaks:
+                min_valley = signal[current_point]
+                min_valley_index = current_point
+                for j in range(current_point + 1, next_point):
+                    if j in valleys and signal[j] < min_valley:
+                        min_valley = signal[j]
+                        min_valley_index = j
+                filtered_valleys.append(min_valley_index)
+
+    return np.array(filtered_peaks), np.array(filtered_valleys)
 

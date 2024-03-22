@@ -1,6 +1,7 @@
-from server.vital.analysis.visualizer import *
+from server.vital.analysis.utils import *
 import numpy as np
 import scipy
+from scipy.signal import hilbert, find_peaks
 from server.vital.pipeline_package import *
 
 
@@ -50,7 +51,7 @@ class VitalCalculator:
 
     def calc_ibi_hr(self):
         self.peaks, self.ibis = peak_detection(self.bpf_ppg, self.fs, 45, 150,
-                                       windowsize=60 / self.fft_hr if self.fft_hr > 0 else 0.75)
+                                               windowsize=60 / self.fft_hr if self.fft_hr > 0 else 0.75)
         hr_list = np.divide(60000, self.ibis)
         self.ibi_hr = np.mean(hr_list)
         return self.ibi_hr
@@ -85,19 +86,62 @@ class VitalCalculator:
         self.lf_hf_ratio = lf_power / hf_power
         return self.lf_hf_ratio
 
+    # def old_calc_spo2(self, RGB):
+    #     r_sig = bandpassfilter.BandpassFilter(filter_type="butterworth", fs=30, low=0.75, high=2.5, order=6).apply(RGB[:, 0])
+    #     b_sig = bandpassfilter.BandpassFilter(filter_type="butterworth", fs=30, low=0.75, high=2.5, order=6).apply(RGB[:, 2])
+    #
+    #     r_mean = np.mean(r_sig)
+    #     r_std = np.std(r_sig)
+    #
+    #     b_mean = np.mean(b_sig)
+    #     b_std = np.std(b_sig)
+    #
+    #     R = (r_std / r_mean) / (b_std / b_mean)
+    #
+    #     self.spo2 = 97.61 + 0.42 * R
+    #     return self.spo2
+
     def calc_spo2(self, RGB):
-        r_sig = bandpassfilter.BandpassFilter(filter_type="butterworth", fs=30, low=0.75, high=2.5, order=6).apply(RGB[:, 0])
-        b_sig = bandpassfilter.BandpassFilter(filter_type="butterworth", fs=30, low=0.75, high=2.5, order=6).apply(RGB[:, 2])
+        r = RGB[:, 0]
+        g = RGB[:, 1]
+        window_length = 10 * 30
+        stride = 1 * 30
+        spo2_list = []
+        num_windows = (len(g) - window_length) // stride + 1
+        for i in range(num_windows):
+            r_dc = butter_lowpass_filter(r[i * stride: i * stride + window_length], 30, 0.7)  # 0.7 Hz 미만 Lowpass
+            g_dc = butter_lowpass_filter(g[i * stride: i * stride + window_length], 30, 0.7)  # 0.7 Hz 미만 Lowpass
+            r_bpf = BPF(r[i * stride: i * stride + window_length] / r_dc, 30, 0.7, 3.0)
+            g_bpf = BPF(g[i * stride: i * stride + window_length] / g_dc, 30, 0.7, 3.0)
 
-        r_mean = np.mean(r_sig)
-        r_std = np.std(r_sig)
+            upper_envelope, lower_envelope = calculate_envelopes(r_bpf)
+            # 에너벌로프의 중앙값 계산
+            r_peak_valley_distance = calculate_peak_valley_distance(upper_envelope, lower_envelope)
 
-        b_mean = np.mean(b_sig)
-        b_std = np.std(b_sig)
+            upper_envelope, lower_envelope = calculate_envelopes(g_bpf)
+            # 에너벌로프의 중앙값 계산
+            g_peak_valley_distance = calculate_peak_valley_distance(upper_envelope, lower_envelope)
 
-        R = (r_std / r_mean) / (b_std / b_mean)
+            g_p, g_v = find_filtered_peaks(g_bpf)
+            r_p, r_v = find_filtered_peaks(r_bpf)
 
-        self.spo2 = 97.61 + 0.42 * R
+            s_g_p = sum(abs(g_bpf[g_p]))
+            s_g_v = sum(abs(g_bpf[g_v]))
+
+            ls_g = np.log(s_g_p / s_g_v)
+
+            s_r_p = sum(abs(r_bpf[r_p]))
+            s_r_v = sum(abs(r_bpf[r_v]))
+
+            ls_r = np.log(s_r_p / s_r_v)
+
+            ls_ratio = ls_r / ls_g
+            hil_ratio = r_peak_valley_distance / g_peak_valley_distance
+
+            ratio = (ls_ratio + hil_ratio) / 2
+            s = -14.80599989961074 * ratio + 112.05782709983683
+            spo2_list.append(s)
+        self.spo2 = np.mean(spo2_list)
         return self.spo2
 
     def calc_bp(self, height, weight, age, gender):
