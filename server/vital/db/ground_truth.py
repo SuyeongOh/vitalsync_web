@@ -15,6 +15,5 @@ class GtRequest(BaseModel):
 
 
 class GtResponse(BaseModel):
-
     status: int = 200
     message: str = "Success"
