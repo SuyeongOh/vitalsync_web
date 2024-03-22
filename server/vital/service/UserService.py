@@ -1,3 +1,5 @@
+import json
+
 from fastapi import FastAPI, HTTPException, status
 import sqlite3
 import server.vital.db.user
@@ -49,3 +51,33 @@ async def register(user: User):
     conn.close()
 
     return {"message": "register successful"}
+
+
+@userService.get("/vital/data/vital")
+async def getData(user_id: str):
+    db = sqlite3.connect(DATA_DB_NAME)
+    cursor = db.cursor()
+    db.execute(server.vital.service.dataLoadQuery, (user_id,))
+    data = cursor.fetchall()
+
+    return json.dumps(data)
+
+
+@userService.get("/vital/data/signal")
+async def getPpgSignal(user_id: str):
+    db = sqlite3.connect(DATA_DB_NAME)
+    cursor = db.cursor()
+    db.execute(server.vital.service.signalLoadQuery, (user_id,))
+    data = cursor.fetchall()
+
+    return json.dumps(data)
+
+
+@userService.get("/vital/data/gt")
+def getGT(user_id: str):
+    db = sqlite3.connect(DATA_DB_NAME)
+    cursor = db.cursor()
+    cursor.execute(gtLoadQuery, (user_id,))
+    data = cursor.fetchall()
+
+    return json.dumps(data)

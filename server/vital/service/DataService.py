@@ -47,15 +47,6 @@ async def saveData(user: str, vitalResponse: VitalResponse, currentTime: str):
         await db.commit()
 
 
-async def getData(user: str):
-    async with aiosqlite.connect(server.vital.DATA_DB_NAME) as db:
-        cursor = await db.cursor()
-        await db.execute(server.vital.service.dataLoadQuery, (user,))
-        data = await cursor.fetchall()
-
-        return data
-
-
 # ppg : ndarray
 async def savePpgSignal(user: str, ppg, r: list[float], g: list[float], b: list[float], currentTime: str):
     async with aiosqlite.connect(server.vital.DATA_DB_NAME) as db:
@@ -84,13 +75,6 @@ async def savePpgSignal(user: str, ppg, r: list[float], g: list[float], b: list[
         await db.commit()
 
 
-async def getPpgSignal(user: str):
-    async with aiosqlite.connect(server.vital.DATA_DB_NAME) as db:
-        cursor = await db.cursor()
-        await db.execute(server.vital.service.signalLoadQuery, (user,))
-        data = await cursor.fetchall()
-
-        return data
 
 
 def saveGt(ground_truth: GtRequest):
@@ -134,16 +118,6 @@ def saveGt(ground_truth: GtRequest):
         response.status = 500
         response.message = "internal error saving ground truth "
         return response
-
-
-async def getGt(user: str):
-    async with aiosqlite.connect(server.vital.DATA_DB_NAME) as db:
-        cursor = await db.cursor()
-        await db.execute(server.vital.service.gtLoadQuery, (user,))
-        data = await cursor.fetchall()
-
-        return data
-
 
 def get_current_time_str():
     # 현재 시간을 datetime 객체로 가져옵니다.
