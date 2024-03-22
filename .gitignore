@@ -1,5 +1,5 @@
-server/users.db
-server/vital/service/health_data.db
+/server/users.db
+/server/vital/service/health_data.db
 server/.idea/inspectionProfiles/
 server/vital/__pycache__/
 server/vital/analysis/__pycache__/

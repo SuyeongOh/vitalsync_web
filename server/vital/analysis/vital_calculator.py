@@ -1,8 +1,8 @@
 from server.vital.analysis.utils import *
 import numpy as np
 import scipy
-from scipy.signal import hilbert, find_peaks
 from server.vital.pipeline_package import *
+from heartpy.analysis import calc_breathing
 
 
 class VitalCalculator:
@@ -30,6 +30,10 @@ class VitalCalculator:
         # BP related
         self.sbp = 0
         self.dbp = 0
+
+        # BR related
+        self.ppg_breathrate = breathrate_pipeline.apply(self.ppg)
+        self.br = 0
 
     def calc_fft_hr(self):
         signal = np.expand_dims(self.hilbert_ppg, 0)
@@ -60,11 +64,12 @@ class VitalCalculator:
         if self.ibis is None:
             self.calc_ibi_hr()
         self.hrv = np.std(self.ibis)
+
         return self.hrv
 
-    def calc_hrv_confidence(self):
-        self.hrv_confidence = np.exp(-abs(self.fft_hr - self.ibi_hr) / 20)  # 95% : 1.02, 90% : 2.11
-        return self.hrv_confidence
+    # def calc_hrv_confidence(self):
+    #     self.hrv_confidence = np.exp(-abs(self.fft_hr - self.ibi_hr) / 20)  # 95% : 1.02, 90% : 2.11
+    #     return self.hrv_confidence
 
     def calc_lfhf(self):
         low_frequency = (0.04, 0.15)
@@ -163,3 +168,22 @@ class VitalCalculator:
         self.dbp = int(MAP - PP / 3)
 
         return self.sbp, self.dbp
+
+    def calc_br(self):
+        signal = np.expand_dims(self.ppg_breathrate, 0)
+        N = next_power_of_2(signal.shape[1])
+        f_br, pxx_br = scipy.signal.periodogram(signal, fs=self.fs, nfft=N, detrend=False)
+        pxx_br = pxx_br.squeeze()
+
+        # get hr range
+        f_br = f_br.squeeze()
+        fmask_br = np.argwhere((f_br >= 0.1) & (f_br <= 0.4))
+
+        masked_br = np.take(f_br, fmask_br)
+        masked_pxx_br = np.take(pxx_br, fmask_br).squeeze()
+
+        masked_fft_br = np.take(masked_br, np.argmax(masked_pxx_br)) * 60
+
+        welch_result_dict, _ = calc_breathing(self.ibis, method='welch')
+        self.br = (masked_fft_br+welch_result_dict['breathingrate']*60)/2
+        return self.br
