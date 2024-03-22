@@ -10,7 +10,7 @@ def bvp_fft_plot(ppg, fs, save_dict=None):
         save_dict = {'save_root_path': '/home/najy/shared_innopia/test_results/20240228/',
                      'name': "test",
                      'model': 'test', 'seq_num': 0, 'desc': 'DBH', 'show_flag': True,
-                     'figsize': (8, 9), 'fontsize': 10,
+                     'figsize': (8, 9), 'fontsize': 10, 'plot_peak': True,
                      'norm_flag': True, 'diff_flag': False}
     """Plot the given signal and FFT of the signal."""
     fig, axs = plt.subplots(3, 1, figsize=save_dict['figsize'])
