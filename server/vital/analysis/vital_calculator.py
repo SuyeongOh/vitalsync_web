@@ -184,6 +184,5 @@ class VitalCalculator:
 
         masked_fft_br = np.take(masked_br, np.argmax(masked_pxx_br)) * 60
 
-        welch_result_dict, _ = calc_breathing(self.ibis, method='welch')
-        self.br = (masked_fft_br+welch_result_dict['breathingrate']*60)/2
+        self.br = masked_fft_br
         return self.br
