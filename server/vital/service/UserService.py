@@ -57,28 +57,54 @@ async def register(user: User):
 async def getData(user_id: str):
     db = sqlite3.connect(DATA_DB_NAME)
     cursor = db.cursor()
-    db.execute(dataLoadQuery, (user_id,))
-    data = cursor.fetchall()
 
-    return data
+    cursor.execute(dataLoadQuery, (user_id,))
+
+    data = cursor.fetchall()
+    fields = [description[0] for description in cursor.description]
+
+    jsonData = []
+    for e in data:
+        parseData = {}
+        for field, value in zip(fields, e):
+            parseData[field] = value
+        jsonData.append(parseData)
+    return jsonData
 
 
 @userService.get("/vital/data/signal")
 async def getPpgSignal(user_id: str):
     db = sqlite3.connect(DATA_DB_NAME)
     cursor = db.cursor()
-    db.execute(signalLoadQuery, (user_id,))
-    data = cursor.fetchall()
 
-    print(data)
-    return data
+    cursor.execute(signalLoadQuery, (user_id,))
+
+    data = cursor.fetchall()
+    fields = [description[0] for description in cursor.description]
+
+    jsonData = []
+    for e in data:
+        parseData = {}
+        for field, value in zip(fields, e):
+            parseData[field] = value
+        jsonData.append(parseData)
+    return jsonData
 
 
 @userService.get("/vital/data/gt")
 def getGT(user_id: str):
     db = sqlite3.connect(DATA_DB_NAME)
     cursor = db.cursor()
+
     cursor.execute(gtLoadQuery, (user_id,))
     data = cursor.fetchall()
+    fields = [description[0] for description in cursor.description]
 
-    return data
+    jsonData = []
+    for e in data:
+        parseData = {}
+        for field, value in zip(fields, e):
+            parseData[field] = value
+        jsonData.append(parseData)
+    return jsonData
+
