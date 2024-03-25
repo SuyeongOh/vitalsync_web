@@ -1,4 +1,5 @@
 import json
+import struct
 
 from fastapi import FastAPI, HTTPException, status
 import sqlite3
@@ -81,14 +82,24 @@ async def getPpgSignal(user_id: str):
 
     data = cursor.fetchall()
     fields = [description[0] for description in cursor.description]
-
+    print(fields)
     jsonData = []
     for e in data:
         parseData = {}
         for field, value in zip(fields, e):
+            if(field == 'ppg'
+                    or field == 'r_signal'
+                    or field == 'g_signal'
+                    or field == 'b_signal'):
+                parseData[field] = blob_to_floatlist(value)
             parseData[field] = value
         jsonData.append(parseData)
+
+    #TODO blob -> float array issue 해결
+
     return jsonData
+
+
 
 
 @userService.get("/vital/data/gt")
@@ -108,3 +119,15 @@ def getGT(user_id: str):
         jsonData.append(parseData)
     return jsonData
 
+
+def blob_to_floatlist(blob_data):
+    unit_size = 4
+    float_array = []
+
+    for i in range(0, len(blob_data), unit_size):
+        binary_data = blob_data[i:i + unit_size]
+
+        float_value = struct.unpack('f', binary_data)[0]
+        float_array.append(float_value)
+
+    return float_array
