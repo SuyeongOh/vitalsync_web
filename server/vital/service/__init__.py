@@ -2,7 +2,7 @@ dataSaveQuery = '''INSERT INTO VitalSigns
                   (UserID, hr, ibi_hr, hrv, rr, spo2, stress, bp, sbp, dbp, MeasurementTime)
                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'''
 
-dataLoadQuery = '''SELECT INTO VitalSigns WHERE UserID = ?'''
+dataLoadQuery = '''SELECT * FROM VitalSigns WHERE UserID = ?'''
 
 signalSaveQuery = '''INSERT INTO VitalSignal
                   (UserID, ppg, r_signal, g_signal, b_signal, MeasurementTime)

@@ -57,7 +57,7 @@ async def register(user: User):
 async def getData(user_id: str):
     db = sqlite3.connect(DATA_DB_NAME)
     cursor = db.cursor()
-    db.execute(server.vital.service.dataLoadQuery, (user_id,))
+    db.execute(dataLoadQuery, (user_id,))
     data = cursor.fetchall()
 
     return data
@@ -67,7 +67,7 @@ async def getData(user_id: str):
 async def getPpgSignal(user_id: str):
     db = sqlite3.connect(DATA_DB_NAME)
     cursor = db.cursor()
-    db.execute(server.vital.service.signalLoadQuery, (user_id,))
+    db.execute(signalLoadQuery, (user_id,))
     data = cursor.fetchall()
 
     print(data)
