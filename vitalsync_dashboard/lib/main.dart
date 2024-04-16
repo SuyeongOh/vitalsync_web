@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vitalsync_dashboard/ui/page_home.dart';
 
 void main() {
   runApp(const VitalSyncDashBoard());
@@ -10,14 +11,8 @@ class VitalSyncDashBoard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: "Vital Sync Info Center",
-      home:
-        Scaffold(appBar: AppBar(
-              elevation: 0,
-              backgroundColor: Colors.transparent,
-              title: Text("Vital Sync Info Center")
-          ),
-        )
+      title: 'Vital Sync Dashboard',
+      home: HomePage(),
     );
   }
 }

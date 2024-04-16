@@ -1,16 +1,16 @@
 import '../resources/app_assets.dart';
 
-enum ChartType { line, bar, pie, scatter, radar }
+enum MenuType { line, bar, pie, scatter, radar }
 
-extension ChartTypeExtension on ChartType {
+extension MenuTypeTypeExtension on MenuType {
   String get displayName => '$simpleName Chart';
 
   String get simpleName => switch (this) {
-        ChartType.line => 'Line',
-        ChartType.bar => 'Bar',
-        ChartType.pie => 'Pie',
-        ChartType.scatter => 'Scatter',
-        ChartType.radar => 'Radar',
+        MenuType.line => 'Line',
+        MenuType.bar => 'Bar',
+        MenuType.pie => 'Pie',
+        MenuType.scatter => 'Scatter',
+        MenuType.radar => 'Radar',
       };
 
   String get documentationUrl => "Urls.getChartDocumentationUrl(this)";

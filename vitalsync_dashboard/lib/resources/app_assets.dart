@@ -1,17 +1,17 @@
-import 'package:fl_chart_app/util/app_helper.dart';
+import 'package:vitalsync_dashboard/utils/app_helper.dart';
 
 class AppAssets {
-  static String getChartIcon(ChartType type) {
+  static String getChartIcon(MenuType type) {
     switch (type) {
-      case ChartType.line:
+      case MenuType.line:
         return 'assets/icons/ic_line_chart.svg';
-      case ChartType.bar:
+      case MenuType.bar:
         return 'assets/icons/ic_bar_chart.svg';
-      case ChartType.pie:
+      case MenuType.pie:
         return 'assets/icons/ic_pie_chart.svg';
-      case ChartType.scatter:
+      case MenuType.scatter:
         return 'assets/icons/ic_scatter_chart.svg';
-      case ChartType.radar:
+      case MenuType.radar:
         return 'assets/icons/ic_radar_chart.svg';
     }
   }
