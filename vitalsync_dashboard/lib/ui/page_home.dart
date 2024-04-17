@@ -1,34 +1,44 @@
 import 'package:flutter/material.dart';
+import 'package:vitalsync_dashboard/ui/page_main.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  MainPage body = MainPage();
+
+
   @override
   Widget build(BuildContext context) {
+    MainPageState bodyState = body.getState();
     return Scaffold(
       appBar: AppBar(
         title: Text('Vital Sync Dashboard'),
       ),
-      body: Center(
-        child: Text('메인 콘텐츠'),
-      ),
+      body: body,
       drawer: Drawer(
         child: ListView(
           children: <Widget>[
             DrawerHeader(
-              child: Text('헤더'),
+              child: Text('Menu'),
               decoration: BoxDecoration(
                 color: Colors.blue,
               ),
             ),
             ListTile(
-              title: Text('메뉴 1'),
+              title: Text('Users'),
               onTap: () {
-                Navigator.pop(context); // 사이드바 닫기
+                Navigator.pop(context);
+                bodyState.selectPage(0);
               },
             ),
             ListTile(
-              title: Text('메뉴 2'),
+              title: Text('Data'),
               onTap: () {
-                Navigator.pop(context); // 사이드바 닫기
+                Navigator.pop(context);
+                bodyState.selectPage(1);
               },
             ),
           ],
