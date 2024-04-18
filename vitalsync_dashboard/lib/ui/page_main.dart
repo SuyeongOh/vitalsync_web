@@ -43,7 +43,7 @@ class MainPageState extends State<MainPage> {
   }
 }
 
-Widget userBody() {
+Widget userBody(String test) {
   final List<String> userIds = ['User123', 'User456', 'User789', 'User101'];
   return Container(
     alignment: Alignment.topCenter,
