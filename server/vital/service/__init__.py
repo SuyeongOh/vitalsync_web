@@ -18,6 +18,8 @@ gtLoadQuery = '''SELECT * FROM GroundTruth WHERE UserID = ?'''
 
 loginQuery = "SELECT * FROM users WHERE user_id = ? AND password = ?"
 
+userListQuery = '''SELECT * FROM users'''
+
 userTableQuery = "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, user_id TEXT, password TEXT)"
 userRegisterQuery = "INSERT INTO users (user_id, password) VALUES (?, ?)"
 userCheckQuery = "SELECT COUNT(*) FROM users WHERE user_id = ?"

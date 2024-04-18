@@ -54,6 +54,25 @@ async def register(user: User):
     return {"message": "register successful"}
 
 
+@userService.get("/user/list")
+async def getUsers():
+    db = sqlite3.connect(USER_DB_NAME)
+    cursor = db.cursor()
+
+    cursor.execute(userListQuery)
+
+    data = cursor.fetchall()
+    fields = [description[0] for description in cursor.description]
+
+    jsonData = []
+    for e in data:
+        parseData = {}
+        for field, value in zip(fields, e):
+            parseData[field] = value
+        jsonData.append(parseData)
+    return jsonData
+
+
 @userService.get("/vital/data/vital")
 async def getData(user_id: str):
     db = sqlite3.connect(DATA_DB_NAME)
