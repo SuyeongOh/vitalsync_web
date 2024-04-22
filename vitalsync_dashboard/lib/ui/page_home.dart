@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:vitalsync_dashboard/ui/page_main.dart';
-import 'package:vitalsync_dashboard/database/http.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -32,7 +31,6 @@ class _HomePageState extends State<HomePage> {
               title: Text('Users'),
               onTap: () {
                 Navigator.pop(context);
-                fetchUsers();
                 bodyState.selectPage(0);
               },
             ),

@@ -1,17 +1,40 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:vitalsync_dashboard/config.dart';
 import 'package:vitalsync_dashboard/database/user_data.dart';
+import 'package:vitalsync_dashboard/database/users_data.dart';
 
 String BASE_URL = "http://35.220.206.239:3000/";
 
-Future<List<UserData>> fetchUsers() async {
+Future<List<UsersData>> fetchUsers() async {
   String api = "user/list";
   final response = await http.get(Uri.parse(BASE_URL + api));
   if (response.statusCode == 200) {
-    print("response body : " + response.body);
     List<dynamic> dataJson = jsonDecode(response.body);
-    return dataJson.map((data) => UserData.fromJson(data)).toList();
+    List<UsersData> userList = dataJson.map((data) => UsersData.fromJson(data)).toList();
+    Config.instance.users = userList;
+    return userList;
   } else {
     throw Exception('Failed to load data');
   }
 }
+
+Future<List<UserData>> fetchUserData(String id) async {
+  String api = "vital/data/vital";
+  var queryParams = {'user_id': id,};
+  final response = await http.get(Uri.parse(BASE_URL + api).replace(queryParameters: queryParams));
+
+  if(response.statusCode == 200){
+    List<dynamic> dataJson = jsonDecode(response.body);
+    List<UserData> userData = dataJson.map((data) => UserData.fromJson(data)).toList();
+
+    Config.instance.userData = userData;
+
+    return userData;
+  } else{
+    throw Exception(response.body);
+  }
+}
+
+
+
