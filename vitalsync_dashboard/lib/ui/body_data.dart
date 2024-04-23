@@ -3,12 +3,18 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 
 import '../database/http.dart';
+import '../database/user_data.dart';
 import '../database/users_data.dart';
 
 class DataBody extends StatefulWidget{
   late DataBodyState _state;
   bool isInitialize = false;
+  final Function(UsersData) onUserCallback;
 
+  DataBody({
+    Key? key,
+    required this.onUserCallback
+  }) : super(key: key);
   @override
   State<StatefulWidget> createState() {
     _state = DataBodyState();
@@ -24,16 +30,12 @@ class DataBody extends StatefulWidget{
   }
 }
 
-class DataBodyState extends State<DataBody>{
+class DataBodyState extends State<DataBody> {
+  late List<double> chartData = [];
+  late List<FlSpot> chartDataSpot = [];
   @override
   Widget build(BuildContext context) {
-    final List<double> chartData = [
-      70,
-      75,
-      80,
-      85
-    ]; // 이 부분은 선택된 사용자에 따라 변경될 수 있습니다.
-    List<FlSpot> chartDataSpot = [];
+    chartData = [70, 75, 80, 85]; // 이 부분은 선택된 사용자에 따라 변경될 수 있습니다.
     for (double i = 1; i <= chartData.length; i++) {
       chartDataSpot.add(FlSpot(i, chartData[i.toInt() - 1]));
     }
@@ -56,9 +58,9 @@ class DataBodyState extends State<DataBody>{
                   children: [
                     DropdownButton<UsersData>(
                       value: selectedUser,
-                      hint: Text("Select User"),
                       onChanged: (newValue) {
                         // 여기서 선택된 사용자에 따라 chartData를 업데이트할 수 있습니다.
+                        print("On Change Target User");
                         setState(() {
                           if (newValue == null) return;
                           selectedUser = newValue;
@@ -73,7 +75,6 @@ class DataBodyState extends State<DataBody>{
                         );
                       }).toList(),
                     ),
-                    Text(selectedUserId),
                     Expanded(
                       child: LineChart(LineChartData(
                           gridData: FlGridData(show: true),
@@ -96,5 +97,9 @@ class DataBodyState extends State<DataBody>{
             return Text('No data available');
           }
         });
+  }
+
+  void setLineData(UserData data){
+
   }
 }

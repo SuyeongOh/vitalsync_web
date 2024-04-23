@@ -2,9 +2,14 @@ import 'dart:js';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:vitalsync_dashboard/database/http.dart';
+import 'package:vitalsync_dashboard/database/users_data.dart';
 import 'package:vitalsync_dashboard/ui/body_data.dart';
 import 'package:vitalsync_dashboard/ui/body_user.dart';
 
+import '../database/user_data.dart';
+
+// Router로 userbody, databody 이동.
 class MainPage extends StatefulWidget {
   late MainPageState _state;
   bool isInitialize = false;
@@ -26,9 +31,21 @@ class MainPage extends StatefulWidget {
 
 class MainPageState extends State<MainPage> {
   int _selectedPageIndex = 0;
+  List<UserData> userData = [];
 
-  UserBody userBody = UserBody();
-  DataBody dataBody = DataBody();
+  final UserBody userBody = UserBody();
+  final DataBody dataBody = DataBody(
+    onUserCallback: (UsersData data) {
+      FutureBuilder(future: fetchUserData(data.user_id),
+          builder: (context, snapshot) {
+            if(snapshot.hasData){
+
+            }
+          });
+    },
+  );
+
+
 
   void selectPage(int index) {
     setState(() {
@@ -39,16 +56,15 @@ class MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     // 각 페이지에 대한 위젯 리스트
-    UserBodyState userState = userBody.getState();
-    DataBodyState dataState = dataBody.getState();
+    final UserBodyState userState = userBody.getState();
+    final DataBodyState dataState = dataBody.getState();
 
     final List<Widget> _pages = [
       Center(child: userState.build(context)),
-      Center(child: dataState.build(context)),
+      dataState.build(context),
       Center(child: Text('Settings Page')),
     ];
 
     return _pages[_selectedPageIndex];
   }
 }
-
