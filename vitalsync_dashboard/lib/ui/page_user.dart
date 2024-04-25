@@ -4,18 +4,18 @@ import 'package:flutter/material.dart';
 import '../database/http.dart';
 import '../database/users_data.dart';
 
-class UserBody extends StatefulWidget{
-  late UserBodyState _state;
+class UserPage extends StatefulWidget {
+  late _UserPageState _state;
   bool isInitialize = false;
 
   @override
   State<StatefulWidget> createState() {
-    _state = UserBodyState();
+    _state = _UserPageState();
     isInitialize = true;
     return _state;
   }
 
-  UserBodyState getState(){
+  _UserPageState getState() {
     if (!isInitialize) {
       createState();
     }
@@ -23,10 +23,10 @@ class UserBody extends StatefulWidget{
   }
 }
 
-class UserBodyState extends State<UserBody> {
+class _UserPageState extends State<UserPage> {
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
+    Widget body = FutureBuilder(
         future: fetchUsers(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -45,12 +45,11 @@ class UserBodyState extends State<UserBody> {
                     DataColumn(label: Text('User ID')),
                   ],
                   rows: userIds
-                      .map((userId) =>
-                      DataRow(
-                        cells: [
-                          DataCell(Text(userId.user_id)),
-                        ],
-                      ))
+                      .map((userId) => DataRow(
+                            cells: [
+                              DataCell(Text(userId.user_id)),
+                            ],
+                          ))
                       .toList(),
                 ),
               ),
@@ -59,6 +58,36 @@ class UserBodyState extends State<UserBody> {
             return Text('No data available');
           }
         });
-  }
 
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('User List'),
+      ),
+      body: body,
+      drawer: Drawer(
+        child: ListView(
+          children: <Widget>[
+            DrawerHeader(
+              child: Text('Menu'),
+              decoration: BoxDecoration(
+                color: Colors.blue,
+              ),
+            ),
+            ListTile(
+              title: Text('Users'),
+              onTap: () {
+                Navigator.pushNamed(context, "/user/list");
+              },
+            ),
+            ListTile(
+              title: Text('Data'),
+              onTap: () {
+                Navigator.pushNamed(context, "/user/data");
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }

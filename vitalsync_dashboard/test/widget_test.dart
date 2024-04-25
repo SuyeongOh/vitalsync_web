@@ -7,10 +7,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:vitalsync_dashboard/main.dart';
 import 'package:vitalsync_dashboard/ui/page_home.dart';
-import 'package:vitalsync_dashboard/ui/page_main.dart';
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {

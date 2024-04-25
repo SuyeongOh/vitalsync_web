@@ -12,40 +12,35 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    MainPageState bodyState = body.getState();
     return Scaffold(
       appBar: AppBar(
         title: Text('Vital Sync Dashboard'),
       ),
       body: body,
-      drawer:
+      drawer: Drawer(
+        child: ListView(
+          children: <Widget>[
+            DrawerHeader(
+              child: Text('Menu'),
+              decoration: BoxDecoration(
+                color: Colors.blue,
+              ),
+            ),
+            ListTile(
+              title: Text('Users'),
+              onTap: () {
+                Navigator.pushNamed(context, "/user/list");
+              },
+            ),
+            ListTile(
+              title: Text('Data'),
+              onTap: () {
+                Navigator.pushNamed(context, "/user/data");
+              },
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
-
-Drawer menuButton = Drawer(
-  child: ListView(
-    children: <Widget>[
-      DrawerHeader(
-        child: Text('Menu'),
-        decoration: BoxDecoration(
-          color: Colors.blue,
-        ),
-      ),
-      ListTile(
-        title: Text('Users'),
-        onTap: () {
-          Navigator.pop(context);
-          bodyState.selectPage(0);
-        },
-      ),
-      ListTile(
-        title: Text('Data'),
-        onTap: () {
-          Navigator.pop(context);
-          bodyState.selectPage(1);
-        },
-      ),
-    ],
-  ),
-),

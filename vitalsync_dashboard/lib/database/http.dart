@@ -19,10 +19,9 @@ Future<List<UsersData>> fetchUsers() async {
   }
 }
 
-Future<List<UserData>> fetchUserData(String id) async {
+Future<List<UserData>> fetchUserData(String user_id) async {
   String api = "vital/data/vital";
-  var queryParams = {'user_id': id,};
-  final response = await http.get(Uri.parse(BASE_URL + api).replace(queryParameters: queryParams));
+  final response = await http.get(Uri.parse("$BASE_URL$api?user_id=$user_id"));
 
   if(response.statusCode == 200){
     List<dynamic> dataJson = jsonDecode(response.body);
