@@ -1,0 +1,17 @@
+DATA:
+  DATASET: 'vv250'
+  DATASET_PATH: '/mnt/ssd/dataset/vv100'
+  PREPROCESSED_PATH: ['/mnt/ssd/preprocessed/vv100_rgb_ppg_hr_age_gender', '/mnt/ssd/preprocessed/vv250_rgb_ppg_hr_age_gender']
+  DO_PREPROCESS: True
+
+TRAIN:
+  BATCH_SIZE: 256
+  EPOCHS: 30000
+  LR: 9e-3
+  LOSS: ['MSE']
+
+MODEL:
+  NAME: 'patcherx_vv250_vv100'
+  INPUT: ['rgb', 'mm_norm_ppg', 'hr', 'age', 'gender']
+  TARGET: ['SBP']
+  SAVE_PATH: '/mnt/ssd/models/'

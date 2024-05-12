@@ -3,4 +3,4 @@ server/vital/service/health_data.db
 server/.idea
 /server/vital/service/health_ppg.db
 /.idea/*
-/server/vital/core/bp/wandb/
+/server/vital/analysis/core/bp/wandb/

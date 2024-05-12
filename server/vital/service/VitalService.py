@@ -4,9 +4,9 @@ from datetime import datetime
 from fastapi import FastAPI, HTTPException, status
 
 from server.vital.analysis.vital_calculator import VitalCalculator
-from server.vital.core.ppg import pos, omit
+from server.vital.analysis.core.ppg import omit
+from server.vital.analysis.core.ppg import pos
 from server.vital.db.ground_truth import GtResponse, GtRequest
-from server.vital.db.vital import VitalRequest, VitalResponse
 from server.vital.pipeline_package import preprocess_pipeline
 from server.vital.service import DataService
 from server.vital.db.vital import VitalRequest, VitalResponse
