@@ -74,6 +74,21 @@ class VitalCalculator:
         self.hrv_confidence = np.exp(-abs(self.fft_hr - self.ibi_hr) / 20)  # 95% : 1.02, 90% : 2.11
         return self.hrv_confidence
 
+    def calc_baevsky_stress_index(self):
+        smallest = np.min(self.ibis)
+        highest = np.max(self.ibis)
+        hist, bin_edges = np.histogram(self.ibis, bins=np.arange(smallest, highest, 50))
+
+        mode_index = np.argmax(hist)
+        mode_bin = bin_edges[mode_index]
+        mode_frequency = hist[mode_index]
+        total_rr_intervals = len(self.ibis)
+
+        amo = (mode_frequency / total_rr_intervals) * 100
+
+        self.b_si = np.sqrt(amo / (2 * mode_bin) * (highest - smallest))
+        return self.b_si
+
     def calc_lfhf(self):
         low_frequency = (0.04, 0.15)
         high_frequency = (0.15, 0.4)
@@ -108,3 +123,7 @@ class VitalCalculator:
 
         self.spo2 = 97.61 + 0.42 * R
         return self.spo2
+
+    def calc_bp(self):
+        bp = 0
+        return bp

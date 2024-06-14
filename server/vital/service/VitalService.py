@@ -55,7 +55,7 @@ async def calculate_vital(vital_request: VitalRequest):
     ibi_hr = vitalcalc.calc_ibi_hr()
     hrv = vitalcalc.calc_hrv()
     hrv_confidence = vitalcalc.calc_hrv_confidence()
-    lf_hf_ratio = vitalcalc.calc_lfhf()
+    lf_hf_ratio = vitalcalc.calc_baevsky_stress_index()
     spo2 = vitalcalc.calc_spo2(RGB)
     print(f"date: {today}, time: {time}\n"
           f"fft_hr: {fft_hr:.2f}, ibi_hr: {ibi_hr:.2f}, hrv: {hrv:.2f}\n"
