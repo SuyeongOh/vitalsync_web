@@ -1,3 +1,4 @@
+from server.vital.analysis.core.bp import trainer
 from server.vital.analysis.visualizer import *
 import numpy as np
 import scipy
@@ -32,6 +33,9 @@ class VitalCalculator:
 
         # SpO2 related
         self.spo2 = 0
+
+        # bp_model definition
+        self.bp_model = None
 
     def visualize_ppg(self):
         bvp_fft_plot(self.ppg, self.fs, self.save_dict)
@@ -124,6 +128,12 @@ class VitalCalculator:
         self.spo2 = 97.61 + 0.42 * R
         return self.spo2
 
-    def calc_bp(self):
-        bp = 0
-        return bp
+    def calc_bp(self, rgb, hr, age, gender):
+        if self.bp_model is None:
+            self.bp_model = load_bp_model(self.bp_model)
+
+        mbp = self.bp_model.forward(rgb, hr, age, gender)
+
+        print(f'mbp :: {mbp}')
+
+        return mbp

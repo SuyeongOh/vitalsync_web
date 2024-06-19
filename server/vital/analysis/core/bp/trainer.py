@@ -6,6 +6,7 @@ import torch.optim as optim
 from tqdm import tqdm
 
 from server.vital.analysis.core.bp.models import *
+from server.vital.analysis.core.bp.models import patcherx
 from server.vital.analysis.visualizer import *
 
 
@@ -165,3 +166,5 @@ class Trainer:
             os.makedirs(save_path)
         model_path = os.path.join(save_path, f"best.pth")
         torch.save(self.model.state_dict(), model_path)
+
+
