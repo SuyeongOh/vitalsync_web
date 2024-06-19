@@ -2,6 +2,8 @@ from heartpy.datautils import rolling_mean
 from heartpy.peakdetection import fit_peaks, calc_rr, check_peaks
 import numpy as np
 from scipy.signal import butter, filtfilt, lfilter, hilbert, find_peaks
+import torch
+from server.vital.analysis.core.bp.models import patcherx
 
 
 def next_power_of_2(x):
@@ -25,6 +27,9 @@ def BPF(input_val, fs=30, low=0.75, high=2.5):
     [b_pulse, a_pulse] = butter(6, [low, high], btype='bandpass')
     return filtfilt(b_pulse, a_pulse, np.double(input_val))
 
+    wd = calc_rr(wd['peaklist'], fs, working_data=wd)
+    wd = check_peaks(wd['RR_list'], wd['peaklist'], wd['ybeat'], reject_segmentwise=True, working_data=wd)
+    peaklist_cor = np.array(wd['peaklist'])[np.where(wd['binary_peaklist'])[0]]
 
 def butter_lowpass_filter(data, fs, cutoff=0.7, order=1):
     nyquist = 0.5 * fs
@@ -117,4 +122,20 @@ def filter_peaks_and_valleys(peaks, valleys, signal):
                 filtered_valleys.append(min_valley_index)
 
     return np.array(filtered_peaks), np.array(filtered_valleys)
+    return peaklist_cor, wd['RR_list_cor']
 
+def load_bp_model(bp_model):
+    if bp_model is None:
+        try:
+            bp_model = patcherx.Model()
+            bp_model.load_state_dict(torch.load('./pretrained_weights/patcherx_best.pth'))
+            bp_model.eval()
+            print("Model loaded successfully.")
+        except FileNotFoundError:
+            print("Model file not found. Please check the file path and try again.")
+            return None
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            return None
+
+    return bp_model

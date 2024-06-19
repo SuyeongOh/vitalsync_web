@@ -1,19 +1,24 @@
+import numpy as np
+import scipy
+from .base import SignalProcessingStep
 from matplotlib import pyplot as plt
 import os
-import scipy
-import numpy as np
-from server.vital.analysis.utils import peak_detection
+from heartpy.datautils import rolling_mean
+from heartpy.peakdetection import fit_peaks
 
 
-class SignalProcessingStep:
-    def __init__(self, **kwargs):
-        self.params = kwargs
+class Visualize(SignalProcessingStep):
+    def __init__(self):
+        super().__init__()
 
-    def apply(self, sig):
-        raise NotImplementedError("Each processing step must implement the 'apply' method.")
+    def apply(self, input_signal):
+        self.bvp_fft_plot(input_signal, 30)
+        return input_signal
 
-    def visualize(self, ppg, save_dict):
-        fs = 30
+    def description(self):
+        return f"{self.__class__.__name__}()"
+
+    def bvp_fft_plot(self, ppg, fs=30, save_dict=None):
         """Plot the given signal and FFT of the signal."""
         fig, axs = plt.subplots(3, 1, figsize=save_dict['figsize'])
         plt.rc('font', size=save_dict['fontsize'])
@@ -36,6 +41,7 @@ class SignalProcessingStep:
             # Plot signal @Time Domain with peak dots
             # peaks_pred, _ = find_peaks(signal, distance=save_dict["peak_distance"])
             axs[0].plot(signal, label=model_name, color='blue')
+            axs[0].set_title(f"{name} | {model_name} : {desc} @Time Domain")
             axs[0].legend(loc='upper right')
             axs[0].grid()
             ################################################################################################################
@@ -53,22 +59,10 @@ class SignalProcessingStep:
             # Find pred freq signal peak
             fft_hr_pred = np.take(f_pred, np.argmax(pxx_pred)) * 60
 
-            if save_dict['plot_peak']:
-                # Plot peak of pred signal using fft_hr_pred
-                peaks_pred, ibis = peak_detection(ppg=signal.squeeze(), fs=fs, bpmmin=45, bpmmax=150,
-                                                  windowsize=60 / fft_hr_pred if fft_hr_pred > 0 else 0.75)
-                peaks_filtered = [peak for peak in peaks_pred if signal.squeeze()[peak] > 0.8]
-                # ibis = np.diff(peaks_pred) / fs * 1000
-                hr_list = np.divide(60000, ibis)
-                ibi_hr = np.mean(hr_list)
-                hrv = np.std(ibis)
-                axs[0].set_title(f"{name} | {model_name} : {desc} @Time Domain\n"
-                                 f"FFT HR: {fft_hr_pred:.2f} BPM | IBI HR: {ibi_hr:.2f} BPM | HRV: {hrv:.2f} ms")
-                axs[0].plot(peaks_pred, signal.squeeze()[peaks_pred], "o", color='orange')
-                axs[0].plot(peaks_filtered, signal.squeeze()[peaks_filtered], "x", color='red')
-            else:
-                axs[0].set_title(f"{name} | {model_name} : {desc} @Time Domain\n"
-                                 f"FFT HR: {fft_hr_pred:.2f} BPM")
+            # Plot peak of pred signal using fft_hr_pred
+            # peaks_pred, _ = self.peak_detection(ppg=signal.squeeze(), fs=fs, bpmmin=45, bpmmax=150,
+            #                                windowsize=60 / fft_hr_pred if fft_hr_pred > 0 else 0.75)
+            # axs[0].plot(peaks_pred, signal.squeeze()[peaks_pred], "o", color='orange')
 
             # Plot FFT of prediction and label
             axs[1].plot(f_pred * 60, pxx_pred, label=model_name, color='blue')
@@ -131,9 +125,12 @@ class SignalProcessingStep:
                 plt.show()
             plt.close()
 
-    def description(self):
-        return f"{self.__class__.__name__}()"
-
     def next_power_of_2(self, x):
         """Calculate the nearest power of 2."""
         return 1 if x == 0 else 2 ** (x - 1).bit_length()
+
+    def peak_detection(self, ppg, fs, bpmmin=45, bpmmax=150, windowsize=0.75):
+        rol_mean = rolling_mean(ppg, windowsize, fs)
+        wd = fit_peaks(ppg, rol_mean, fs, bpmmin, bpmmax)
+
+        return wd['peaklist'], wd['RR_list']

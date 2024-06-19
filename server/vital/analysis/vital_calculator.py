@@ -1,14 +1,21 @@
 from server.vital.analysis.utils import *
+from server.vital.analysis.core.bp import trainer
+from server.vital.analysis.visualizer import *
 import numpy as np
 import scipy
 from server.vital.pipeline_package import *
 from heartpy.analysis import calc_breathing
+from server.vital.pipeline_package import *
 
 
 class VitalCalculator:
-    def __init__(self, ppg, fs):
+    def __init__(self, ppg, fs, save_dict):
         self.ppg = detrend.Detrend().apply(ppg)
         self.fs = fs
+        self.model = save_dict['model']
+        self.save_dict = save_dict
+        self.visualize_ppg()
+
 
         # HR related
         self.bpf_ppg = heartrate_pipeline.apply(self.ppg)
@@ -34,6 +41,14 @@ class VitalCalculator:
         # BR related
         self.ppg_breathrate = breathrate_pipeline.apply(self.ppg)
         self.br = 0
+        # bp_model definition
+        self.bp_model = None
+
+    def visualize_ppg(self):
+        bvp_fft_plot(self.ppg, self.fs, self.save_dict)
+    #
+    # def visualize_rgb(self, rgb):
+    #     rgb_plot(rgb, self.save_dict)
 
     def calc_fft_hr(self):
         signal = np.expand_dims(self.hilbert_ppg, 0)
@@ -70,6 +85,25 @@ class VitalCalculator:
     # def calc_hrv_confidence(self):
     #     self.hrv_confidence = np.exp(-abs(self.fft_hr - self.ibi_hr) / 20)  # 95% : 1.02, 90% : 2.11
     #     return self.hrv_confidence
+
+    def calc_hrv_confidence(self):
+        self.hrv_confidence = np.exp(-abs(self.fft_hr - self.ibi_hr) / 20)  # 95% : 1.02, 90% : 2.11
+        return self.hrv_confidence
+
+    def calc_baevsky_stress_index(self):
+        smallest = np.min(self.ibis)
+        highest = np.max(self.ibis)
+        hist, bin_edges = np.histogram(self.ibis, bins=np.arange(smallest, highest, 50))
+
+        mode_index = np.argmax(hist)
+        mode_bin = bin_edges[mode_index]
+        mode_frequency = hist[mode_index]
+        total_rr_intervals = len(self.ibis)
+
+        amo = (mode_frequency / total_rr_intervals) * 100
+
+        self.b_si = np.sqrt(amo / (2 * mode_bin) * (highest - smallest))
+        return self.b_si
 
     def calc_lfhf(self):
         low_frequency = (0.04, 0.15)
@@ -186,3 +220,14 @@ class VitalCalculator:
 
         self.br = masked_fft_br
         return self.br
+
+
+    def calc_mbp(self, rgb, hr, age, gender):
+        if self.bp_model is None:
+            self.bp_model = load_bp_model(self.bp_model)
+
+        mbp = self.bp_model.forward(rgb, hr, age, gender)
+
+        print(f'mbp :: {mbp}')
+
+        return mbp

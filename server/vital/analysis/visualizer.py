@@ -10,7 +10,7 @@ def bvp_fft_plot(ppg, fs, save_dict=None):
         save_dict = {'save_root_path': '/home/najy/shared_innopia/test_results/20240228/',
                      'name': "test",
                      'model': 'test', 'seq_num': 0, 'desc': 'DBH', 'show_flag': True,
-                     'figsize': (8, 9), 'fontsize': 10,
+                     'figsize': (8, 9), 'fontsize': 10, 'plot_peak': True,
                      'norm_flag': True, 'diff_flag': False}
     """Plot the given signal and FFT of the signal."""
     fig, axs = plt.subplots(3, 1, figsize=save_dict['figsize'])
@@ -52,9 +52,10 @@ def bvp_fft_plot(ppg, fs, save_dict=None):
         # Find pred freq signal peak
         fft_hr_pred = np.take(f_pred, np.argmax(pxx_pred)) * 60
 
-        # Plot peak of pred signal using fft_hr_pred
-        peaks_pred, _ = peak_detection(ppg=signal.squeeze(), fs=fs, bpmmin=45, bpmmax=150, windowsize=60/fft_hr_pred if fft_hr_pred > 0 else 0.75)
-        axs[0].plot(peaks_pred, signal.squeeze()[peaks_pred], "o", color='orange')
+        if save_dict['plot_peak']:
+            # Plot peak of pred signal using fft_hr_pred
+            peaks_pred, _ = peak_detection(ppg=signal.squeeze(), fs=fs, bpmmin=45, bpmmax=150, windowsize=60/fft_hr_pred if fft_hr_pred > 0 else 0.75)
+            axs[0].plot(peaks_pred, signal.squeeze()[peaks_pred], "o", color='orange')
 
         # Plot FFT of prediction and label
         axs[1].plot(f_pred * 60, pxx_pred, label=model_name, color='blue')
@@ -118,13 +119,7 @@ def bvp_fft_plot(ppg, fs, save_dict=None):
         plt.close()
 
 
-def rgb_plot(rgb, save_dict=None):
-    if save_dict is None:
-        save_dict = {'save_root_path': '/home/najy/shared_innopia/test_results/20240228/',
-                     'name': "test",
-                     'model': 'test', 'seq_num': 0, 'desc': 'DBH', 'show_flag': True,
-                     'figsize': (8, 9), 'fontsize': 10,
-                     'norm_flag': True, 'diff_flag': False}
+def rgb_plot(rgb, save_dict):
     """Plot the RGB signal separately."""
     save_root_path = save_dict['save_root_path']
     name = save_dict['name']
@@ -160,7 +155,6 @@ def rgb_plot(rgb, save_dict=None):
     if not os.path.isdir(save_path):
         os.makedirs(save_path)
     plt.savefig(f"{save_path}/{seq_num}_{name}_{desc}.png".replace(' ', '_'), dpi=300)
-    if save_dict['show_flag']:
-        plt.show()
+    plt.show()
     plt.close()
 
