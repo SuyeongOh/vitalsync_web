@@ -1,8 +1,9 @@
-import matplotlib
-import matplotlib.pyplot as plt
-from server.vital.analysis.utils import *
-import scipy
 import os
+
+import matplotlib.pyplot as plt
+import scipy
+
+from server.vital.analysis.utils import *
 
 
 def bvp_fft_plot(ppg, fs, save_dict=None):

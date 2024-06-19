@@ -1,8 +1,9 @@
+import numpy as np
+import torch
 from heartpy.datautils import rolling_mean
 from heartpy.peakdetection import fit_peaks, calc_rr, check_peaks
-import numpy as np
 from scipy.signal import butter, filtfilt, lfilter, hilbert, find_peaks
-import torch
+
 from server.vital.analysis.core.bp.models import patcherx
 
 
@@ -122,7 +123,6 @@ def filter_peaks_and_valleys(peaks, valleys, signal):
                 filtered_valleys.append(min_valley_index)
 
     return np.array(filtered_peaks), np.array(filtered_valleys)
-    return peaklist_cor, wd['RR_list_cor']
 
 def load_bp_model(bp_model):
     if bp_model is None:
