@@ -37,7 +37,7 @@ async def register(user: User):
     print('size : ' + str(cursor.arraysize))
     cursor.execute(userTableQuery)
 
-    cursor.execute(userCheckQuery, (user.user_id))
+    cursor.execute(userCheckQuery, (user.user_id,))
     result = cursor.fetchone()[0]
     if result > 0:
         return {"message": "user_id already exists"}

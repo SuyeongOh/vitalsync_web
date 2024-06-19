@@ -22,5 +22,4 @@ userListQuery = '''SELECT * FROM users'''
 
 userTableQuery = "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, user_id TEXT, password TEXT)"
 userRegisterQuery = "INSERT INTO users (user_id, password) VALUES (?, ?)"
-userCheckQuery = "SELECT COUNT(*) FROM users WHERE user_id = ?"
-
+userCheckQuery = "SELECT EXISTS(SELECT 1 FROM users WHERE user_id = ?)"
