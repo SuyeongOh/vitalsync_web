@@ -1,3 +1,6 @@
+import scipy.signal.windows
+from scipy.signal.windows import hamming
+
 from server.vital.analysis.visualizer import *
 from server.vital.pipeline_package import *
 
@@ -177,6 +180,30 @@ class VitalCalculator:
         self.spo2 = np.mean(spo2_list)
         return self.spo2
 
+    def calc_br(self):
+
+
+        window_hamming = hamming(len(self.ppg_breathrate))
+        signal_hamming = self.ppg_breathrate * window_hamming
+
+        signal = np.expand_dims(signal_hamming, 0)
+
+        N = next_power_of_2(signal.shape[1])
+        f_br, pxx_br = scipy.signal.periodogram(signal, fs=self.fs, nfft=N, detrend=False)
+        pxx_br = pxx_br.squeeze()
+
+        # get br range
+        f_br = f_br.squeeze()
+        fmask_br = np.argwhere((f_br >= 0.1) & (f_br <= 1))
+
+        masked_br = np.take(f_br, fmask_br)
+        masked_pxx_br = np.take(pxx_br, fmask_br).squeeze()
+
+        masked_fft_br = np.take(masked_br, np.argmax(masked_pxx_br)) * 60
+
+        self.br = masked_fft_br
+        return self.br
+
     def calc_bp(self, height, weight, age, gender):
         Q = 5 if gender == 'male' else 4.5
         # Resistivity of blood
@@ -196,24 +223,6 @@ class VitalCalculator:
         self.dbp = int(MAP - PP / 3)
 
         return self.sbp, self.dbp
-
-    def calc_br(self):
-        signal = np.expand_dims(self.ppg_breathrate, 0)
-        N = next_power_of_2(signal.shape[1])
-        f_br, pxx_br = scipy.signal.periodogram(signal, fs=self.fs, nfft=N, detrend=False)
-        pxx_br = pxx_br.squeeze()
-
-        # get hr range
-        f_br = f_br.squeeze()
-        fmask_br = np.argwhere((f_br >= 0.1) & (f_br <= 0.4))
-
-        masked_br = np.take(f_br, fmask_br)
-        masked_pxx_br = np.take(pxx_br, fmask_br).squeeze()
-
-        masked_fft_br = np.take(masked_br, np.argmax(masked_pxx_br)) * 60
-
-        self.br = masked_fft_br
-        return self.br
 
 
     def calc_mbp(self, rgb, hr, age, gender):
