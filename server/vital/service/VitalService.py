@@ -4,7 +4,7 @@ import numpy as np
 from fastapi import FastAPI, HTTPException, status
 
 from server.vital.analysis.vital_calculator import VitalCalculator
-from server.vital.core import pos
+from server.vital.analysis.core.ppg import pos
 from server.vital.db.ground_truth import GtResponse, GtRequest
 from server.vital.db.vital import VitalRequest, VitalResponse
 from server.vital.pipeline_package import preprocess_pipeline
