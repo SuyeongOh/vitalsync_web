@@ -127,7 +127,8 @@ def filter_peaks_and_valleys(peaks, valleys, signal):
 def load_bp_model(bp_model):
     if bp_model is None:
         try:
-            bp_model = patcherx.Model()
+            device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+            bp_model = patcherx.Model().to(device).float()
             bp_model.load_state_dict(torch.load('./pretrained_weights/patcherx_best.pth'))
             bp_model.eval()
             print("Model loaded successfully.")

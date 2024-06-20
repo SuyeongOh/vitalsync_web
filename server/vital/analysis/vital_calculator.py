@@ -1,3 +1,4 @@
+import numpy as np
 import scipy.signal.windows
 from scipy.signal.windows import hamming
 
@@ -229,8 +230,18 @@ class VitalCalculator:
         if self.bp_model is None:
             self.bp_model = load_bp_model(self.bp_model)
 
-        mbp = self.bp_model.forward(rgb, hr, age, gender)
+        if rgb is not None:
+            rgb = torch.from_numpy(rgb)
+        hr = np.array(hr)
+        age = np.array(age)
+        gender = np.array(gender)
 
+        mbp = self.bp_model(rgb, hr, age, gender)
         print(f'mbp :: {mbp}')
 
         return mbp
+
+if __name__ == '__main__':
+    pred_ppg = np.random.uniform(-1,1, size=600).astype(np.float32)
+    vitalcalc = VitalCalculator(pred_ppg, 30)
+    vitalcalc.calc_mbp(pred_ppg, 70, 25, )
