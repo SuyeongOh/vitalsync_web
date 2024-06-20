@@ -1,4 +1,5 @@
 import asyncio
+from datetime import datetime
 
 import numpy as np
 from fastapi import FastAPI, HTTPException, status
@@ -19,7 +20,9 @@ async def calculate_vital(vital_request: VitalRequest):
     if not vital_request.RGB:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid RGB data.")
 
-    # preprocess RGB data
+    # 계산된 결과를 반환합니다. 실제 애플리케이션에서는 계산 로직에 따라 결과가 달라질 것입니다.
+
+    # Calculate PPG
     RGB = np.asarray(vital_request.RGB).transpose(1, 0)
     RGB = preprocess_pipeline.apply(RGB)
 

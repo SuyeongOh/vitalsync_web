@@ -7,15 +7,9 @@ class Pipeline:
     def add_step(self, step):
         self.steps.append(step)
 
-    def apply(self, signal, save_dict):
+    def apply(self, signal):
         for i, step in enumerate(self.steps):
             signal = step.apply(signal)
-            if save_dict['show_flag']:
-                save_dict['seq_num'] += 1
-                save_dict['desc'] = step.description()
-                if i == len(self.steps) - 1:
-                    save_dict['plot_peak'] = True
-                step.visualize(signal, save_dict)
         return signal
 
     def get_processing_steps(self):

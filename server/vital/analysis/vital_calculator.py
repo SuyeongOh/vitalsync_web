@@ -6,12 +6,12 @@ from server.vital.pipeline_package import *
 
 
 class VitalCalculator:
-    def __init__(self, ppg, fs, save_dict):
+    def __init__(self, ppg, fs):
         self.ppg = detrend.Detrend().apply(ppg)
         self.fs = fs
-        self.model = save_dict['model']
-        self.save_dict = save_dict
-        self.visualize_ppg()
+        self.save_dict = None
+        # self.model = save_dict['model']
+        # self.save_dict = save_dict
 
 
         # HR related
