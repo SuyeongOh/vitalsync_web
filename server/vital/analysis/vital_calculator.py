@@ -1,7 +1,10 @@
 import numpy as np
 import scipy.signal.windows
+import torch
 from scipy.signal.windows import hamming
 
+from server.vital.analysis.core.bp.datasets import vitalvideos5input_dataset
+from server.vital.analysis.core.ppg import pos
 from server.vital.analysis.visualizer import *
 from server.vital.pipeline_package import *
 
@@ -40,7 +43,7 @@ class VitalCalculator:
         self.ppg_breathrate = breathrate_pipeline.apply(self.ppg)
         self.br = 0
         # bp_model definition
-        self.bp_model = None
+        self.bp_model = load_bp_model()
 
     def visualize_ppg(self):
         bvp_fft_plot(self.ppg, self.fs, self.save_dict)
@@ -226,22 +229,58 @@ class VitalCalculator:
         return self.sbp, self.dbp
 
 
-    def calc_mbp(self, rgb, hr, age, gender):
+    def calc_mbp(self, rgb, ppg, hr, age, gender):
         if self.bp_model is None:
-            self.bp_model = load_bp_model(self.bp_model)
+            self.bp_model = load_bp_model()
 
-        if rgb is not None:
-            rgb = torch.from_numpy(rgb)
+        ppg = vitalvideos5input_dataset.min_max_normalize(ppg)
+        rgb = np.array(rgb)
+        ppg = np.array(ppg)
         hr = np.array(hr)
         age = np.array(age)
+        if gender == 'male':
+            gender = 0
+        elif gender == 'female':
+            gender = 1
         gender = np.array(gender)
 
-        mbp = self.bp_model(rgb, hr, age, gender)
+        mbp = self.bp_model(torch.hstack([torch.tensor(rgb, dtype=torch.float32), torch.tensor(ppg, dtype=torch.float32).unsqueeze(1)]).unsqueeze(0),
+                                    torch.tensor(hr, dtype=torch.float32).unsqueeze(0),
+                                    torch.tensor(age, dtype=torch.float32).unsqueeze(0),
+                                    torch.tensor(gender, dtype=torch.float32).unsqueeze(0))
         print(f'mbp :: {mbp}')
 
         return mbp
 
+import json
+
+def parse_rgb():
+    # 1. 텍스트 파일 읽기
+    file_path = 'core/bp/sample_data_ppg.txt'
+    with open(file_path, 'r') as file:
+        data = file.read()
+
+    # 2. JSON 데이터 파싱
+    data_json = json.loads(data)
+
+    # 3. RGB 값 추출
+    rgb_values = data_json['RGB']
+
+    # 결과 확인
+    print(rgb_values)
+    return np.array(rgb_values)
+
 if __name__ == '__main__':
-    pred_ppg = np.random.uniform(-1,1, size=600).astype(np.float32)
+    #pred_ppg = np.random.uniform(-1,1, size=600).astype(np.float32)
+    rgb = parse_rgb()
+    # Calculate PPG
+    RGB = np.asarray(rgb).transpose(1, 0)
+    RGB = preprocess_pipeline.apply(RGB)
+
+    # Calculate PPG
+    pred_ppg = pos.POS(RGB, 30)
+    #pred_ppg = vitalvideos5input_dataset.min_max_normalize(pred_ppg)
+
     vitalcalc = VitalCalculator(pred_ppg, 30)
-    vitalcalc.calc_mbp(pred_ppg, 70, 25, )
+    mbp = vitalcalc.calc_mbp(RGB, pred_ppg, 80, 25, "male")
+    print(mbp)

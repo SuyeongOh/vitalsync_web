@@ -51,9 +51,8 @@ class VitalVideos5input_dataset(Dataset):
         rgb, ppg, hr, age, gender, bp = load_data_from_hdf5(self.data_files[idx])
         ppg = min_max_normalize(ppg)
         # bp = 0.33 * bp[0] + 0.66 * bp[1]
-        return torch.hstack([torch.tensor(rgb, dtype=torch.float32),
-                             torch.tensor(ppg, dtype=torch.float32).unsqueeze(1)]), torch.tensor(hr,
-                                                                                                 dtype=torch.float32).unsqueeze(
-            0), torch.tensor(age, dtype=torch.float32).unsqueeze(0), torch.tensor(gender,
-                                                                                  dtype=torch.float32), torch.tensor(bp[0],
-                                                                                                                     dtype=torch.float32)
+        return (torch.hstack([torch.tensor(rgb, dtype=torch.float32), torch.tensor(ppg, dtype=torch.float32).unsqueeze(1)]),
+                torch.tensor(hr, dtype=torch.float32).unsqueeze(0),
+                torch.tensor(age, dtype=torch.float32).unsqueeze(0),
+                torch.tensor(gender, dtype=torch.float32),
+                torch.tensor(bp[0], dtype=torch.float32))

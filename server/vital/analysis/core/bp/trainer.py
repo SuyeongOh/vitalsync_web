@@ -67,12 +67,17 @@ class Trainer:
                     ppg, bp = batch[0].to(self.device), batch[1].to(self.device)
                     outputs = self.model(ppg)
                 elif num_input == 3:
-                    ppg, age, gender, bp = batch[0].to(self.device), batch[1].to(self.device), batch[2].to(self.device), \
-                        batch[3].to(self.device)
+                    ppg, age, gender, bp = (batch[0].to(self.device),
+                                            batch[1].to(self.device),
+                                            batch[2].to(self.device),
+                                            batch[3].to(self.device))
                     outputs = self.model(ppg, age, gender)
                 elif num_input == 4:
-                    signal, hr, age, gender, bp = batch[0].to(self.device), batch[1].to(self.device), batch[2].to(
-                        self.device), batch[3].to(self.device), batch[4].to(self.device)
+                    signal, hr, age, gender, bp = (batch[0].to(self.device),
+                                                   batch[1].to(self.device),
+                                                   batch[2].to(self.device),
+                                                   batch[3].to(self.device),
+                                                   batch[4].to(self.device))
                     outputs = self.model(signal, hr, age, gender)
                 else:
                     raise ValueError("Invalid number of input")
@@ -83,7 +88,7 @@ class Trainer:
                 # return
 
                 # outputs = self.model(ppg)  # , age, gender)
-                loss = self.criterion1(outputs, bp) #+ self.criterion2(outputs, bp)
+                loss = self.criterion1(outputs, bp)  # + self.criterion2(outputs, bp)
                 loss.backward()
 
                 lrs.append(self.scheduler.get_last_lr())
@@ -136,8 +141,7 @@ class Trainer:
                         2].to(self.device), valid_batch[3].to(self.device)
                     outputs = self.model(ppg, age, gender)
                 elif num_input == 4:
-                    signal, hr, age, gender, bp = valid_batch[0].to(self.device), valid_batch[1].to(self.device), \
-                        valid_batch[2].to(self.device), valid_batch[3].to(self.device), valid_batch[4].to(self.device)
+                    signal, hr, age, gender, bp = valid_batch[0].to(self.device), valid_batch[1].to(self.device), valid_batch[2].to(self.device), valid_batch[3].to(self.device), valid_batch[4].to(self.device)
                     outputs = self.model(signal, hr, age, gender)
                 else:
                     raise ValueError("Invalid number of input")
@@ -166,5 +170,3 @@ class Trainer:
             os.makedirs(save_path)
         model_path = os.path.join(save_path, f"best.pth")
         torch.save(self.model.state_dict(), model_path)
-
-

@@ -124,19 +124,18 @@ def filter_peaks_and_valleys(peaks, valleys, signal):
 
     return np.array(filtered_peaks), np.array(filtered_valleys)
 
-def load_bp_model(bp_model):
-    if bp_model is None:
-        try:
-            device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-            bp_model = patcherx.Model().to(device).float()
-            bp_model.load_state_dict(torch.load('./pretrained_weights/patcherx_best.pth'))
-            bp_model.eval()
-            print("Model loaded successfully.")
-        except FileNotFoundError:
-            print("Model file not found. Please check the file path and try again.")
-            return None
-        except Exception as e:
-            print(f"An error occurred: {e}")
-            return None
+def load_bp_model():
+    try:
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        bp_model = patcherx.Model().to(device).float()
+        bp_model.load_state_dict(torch.load('core/bp/pretrained_weights/patcherx_best.pth', map_location=torch.device("cpu")))
+        bp_model.eval()
+        print("Model loaded successfully.")
+    except FileNotFoundError:
+        print("Model file not found. Please check the file path and try again.")
+        return None
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return None
 
     return bp_model
