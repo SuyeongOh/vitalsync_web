@@ -124,6 +124,36 @@ def filter_peaks_and_valleys(peaks, valleys, signal):
 
     return np.array(filtered_peaks), np.array(filtered_valleys)
 
+def closest_pairs(a, b):
+    used_a = set()
+    used_b = set()
+    result_a = []
+    result_b = []
+
+    for _ in range(min(len(a), len(b))):
+        min_diff = float('inf')
+        pair = (None, None)
+
+        for i in range(len(a)):
+            if i in used_a:
+                continue
+            for j in range(len(b)):
+                if j in used_b:
+                    continue
+                diff = abs(a[i] - b[j])
+                if diff < min_diff:
+                    min_diff = diff
+                    pair = (i, j)
+
+        if pair != (None, None):
+            used_a.add(pair[0])
+            used_b.add(pair[1])
+            result_a.append(a[pair[0]])
+            result_b.append(b[pair[1]])
+
+    return np.array(result_a), np.array(result_b)
+
+
 def load_bp_model():
     try:
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")

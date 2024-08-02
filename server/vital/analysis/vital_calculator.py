@@ -142,6 +142,49 @@ class VitalCalculator:
     #     return self.spo2
 
     def calc_spo2(self, RGB):
+        r = np.array(RGB[:, 0])
+        g = np.array(RGB[:, 1])
+        b = np.array(RGB[:, 2])
+        #RoR 계산과정
+        HbO2 = 0.125 * r + 0.128 * g - 0.253 * b
+        Hb = -0.025 * r + 0.165 * g - 0.140 * b
+
+        HbO2 = BPF(HbO2, self.fs, 0.7, 3.0)
+        Hb = BPF(Hb, self.fs, 0.7, 3.0)
+
+        HbO2 = Detrend().apply(HbO2)
+        Hb = Detrend().apply(Hb)
+
+        HbO2_peak, HbO2_valley = find_filtered_peaks(HbO2)
+        Hb_peak, Hb_valley = find_filtered_peaks(Hb)
+
+        common_p = np.intersect1d(HbO2_peak, Hb_peak)
+        common_v = np.intersect1d(HbO2_valley, Hb_valley)
+
+        filtered_p, filtered_v = closest_pairs(common_p, common_v)
+
+        if len(filtered_p) == 0 or len(filtered_v) == 0:
+            return 0
+
+        baseline_correction = np.abs(min(np.min(HbO2), np.min(Hb))) + 1
+        hbo2_p = HbO2[filtered_p] + baseline_correction
+        hbo2_v = HbO2[filtered_v] + baseline_correction
+        ls_hb = np.log(hbo2_v / hbo2_p)
+        hb_p = Hb[filtered_p] + baseline_correction
+        hb_v = Hb[filtered_v] + baseline_correction
+
+        ls_hbo2 = np.log(hb_v / hb_p)  # hbo2_p - hbo2_v  # np.log(hbo2_p / hbo2_v)
+        # ls_hb = hb_p - hb_v
+        # ls_hb = np.log(hb_p / hb_v)
+        if np.median(ls_hbo2 / ls_hb) > 1:
+            RoR = np.median(ls_hbo2 / ls_hb)
+        else:
+            RoR = np.median(ls_hb / ls_hbo2)
+
+        #SpO2 계산과정
+        return -0.7836 * RoR + 102.4280
+
+    def calc_spo2_lagacy(self, RGB):
         r = RGB[:, 0]
         g = RGB[:, 1]
         window_length = 10 * 30
