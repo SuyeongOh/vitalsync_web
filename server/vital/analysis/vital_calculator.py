@@ -141,19 +141,27 @@ class VitalCalculator:
     #     self.spo2 = 97.61 + 0.42 * R
     #     return self.spo2
 
+
     def calc_spo2(self, RGB):
-        r = np.array(RGB[:, 0])
-        g = np.array(RGB[:, 1])
-        b = np.array(RGB[:, 2])
         #RoR 계산과정
-        HbO2 = 0.125 * r + 0.128 * g - 0.253 * b
-        Hb = -0.025 * r + 0.165 * g - 0.140 * b
 
-        HbO2 = BPF(HbO2, self.fs, 0.7, 3.0)
-        Hb = BPF(Hb, self.fs, 0.7, 3.0)
+        HbO2 = (0.13214285714285712 * RGB[0]) + (0.11964285714285716 * RGB[1]) + (-0.251785714 * RGB[2])
+        Hb = (-0.019642857 * RGB[0]) + (- 0.0125 * RGB[1]) + (0.032142857 * RGB[2])
+        scale = 10000
 
-        HbO2 = Detrend().apply(HbO2)
-        Hb = Detrend().apply(Hb)
+        if np.corrcoef(HbO2, Hb)[1][0] < 0:
+            Hb *= -1
+
+        HbO2 = BPF_new(HbO2, self.fs, 0.7, 3.0)
+        Hb = BPF_new(Hb, self.fs, 0.7, 3.0)
+
+        HbO2 = Detrend().apply_new(HbO2)
+        Hb = Detrend().apply_new(Hb)
+
+        HbO2 = (HbO2 - np.mean(HbO2)) * scale
+        Hb = (Hb - np.mean(Hb)) * scale
+
+
 
         HbO2_peak, HbO2_valley = find_filtered_peaks(HbO2)
         Hb_peak, Hb_valley = find_filtered_peaks(Hb)
@@ -182,7 +190,7 @@ class VitalCalculator:
             RoR = np.median(ls_hb / ls_hbo2)
 
         #SpO2 계산과정
-        return -0.7836 * RoR + 102.4280
+        return -0.783626023 * RoR + 102.42805451382233
 
     def calc_spo2_lagacy(self, RGB):
         r = RGB[:, 0]
@@ -318,12 +326,13 @@ if __name__ == '__main__':
     rgb = parse_rgb()
     # Calculate PPG
     RGB = np.asarray(rgb).transpose(1, 0)
-    RGB = preprocess_pipeline.apply(RGB)
+    #RGB = preprocess_pipeline.apply(RGB)
 
     # Calculate PPG
     pred_ppg = pos.POS(RGB, 30)
     #pred_ppg = vitalvideos5input_dataset.min_max_normalize(pred_ppg)
 
     vitalcalc = VitalCalculator(pred_ppg, 30)
-    mbp = vitalcalc.calc_mbp(RGB, pred_ppg, 80, 25, "male")
-    print(mbp)
+    # mbp = vitalcalc.calc_mbp(RGB, pred_ppg, 80, 25, "male")
+    spo2 = vitalcalc.calc_spo2(rgb)
+    print(spo2)

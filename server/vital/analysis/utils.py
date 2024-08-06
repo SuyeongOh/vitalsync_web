@@ -32,6 +32,27 @@ def BPF(input_val, fs=30, low=0.75, high=2.5):
     wd = check_peaks(wd['RR_list'], wd['peaklist'], wd['ybeat'], reject_segmentwise=True, working_data=wd)
     peaklist_cor = np.array(wd['peaklist'])[np.where(wd['binary_peaklist'])[0]]
 
+def BPF_new(input_val, fs=30, low=0.75, high=2.5,order = 6):
+    low = low / (0.5 * fs)
+    high = high / (0.5 * fs)
+    [b_pulse, a_pulse] = butter(order, [low, high], btype='bandpass')
+    if isinstance(input_val, torch.Tensor):
+        input_val = input_val.cpu().numpy()
+
+    input_val = np.double(input_val)
+
+    # Save original mean and standard deviation
+    original_mean = np.mean(input_val)
+    original_std = np.std(input_val)
+
+    # Apply bandpass filter
+    filtered_val = filtfilt(b_pulse, a_pulse, input_val)
+
+    # Restore the original mean and standard deviation
+    filtered_val = (filtered_val - np.mean(filtered_val)) * (original_std / np.std(filtered_val)) + original_mean
+
+    return filtered_val
+
 def butter_lowpass_filter(data, fs, cutoff=0.7, order=1):
     nyquist = 0.5 * fs
     normal_cutoff = cutoff / nyquist
