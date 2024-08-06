@@ -37,10 +37,10 @@ async def calculate_vital(vital_request: VitalRequest):
     stress = vitalcalc.calc_baevsky_stress_index()
     #stress = vitalcalc.calc_lfhf()
     spo2 = vitalcalc.calc_spo2(vital_request.RGB)
-    #sbp, dbp = vitalcalc.calc_bp(vital_request.height, vital_request.weight, vital_request.age, vital_request.gender)
-    mbp = vitalcalc.calc_mbp(RGB, fft_hr, vital_request.age, vital_request.gender)
-    sbp = mbp + 13
-    dbp = mbp - 26
+    sbp, dbp = vitalcalc.calc_bp(vital_request.height, vital_request.weight, vital_request.age, vital_request.gender)
+    # mbp = vitalcalc.calc_mbp(rgb=RGB, ppg=pred_ppg, hr=fft_hr, age=vital_request.age, gender=vital_request.gender)
+    # sbp = mbp + 13
+    # dbp = mbp - 26
     br = vitalcalc.calc_br()
     print(f"date: {vital_request.measureTime}\n"
           f"fft_hr: {fft_hr:.2f}, ibi_hr: {ibi_hr:.2f}, hrv: {hrv:.2f}\n"
