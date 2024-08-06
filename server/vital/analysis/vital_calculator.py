@@ -144,7 +144,8 @@ class VitalCalculator:
 
     def calc_spo2(self, RGB):
         #RoR 계산과정
-
+        if not isinstance(RGB, np.ndarray):
+            RGB = np.array(RGB)
         HbO2 = (0.13214285714285712 * RGB[0]) + (0.11964285714285716 * RGB[1]) + (-0.251785714 * RGB[2])
         Hb = (-0.019642857 * RGB[0]) + (- 0.0125 * RGB[1]) + (0.032142857 * RGB[2])
         scale = 10000
