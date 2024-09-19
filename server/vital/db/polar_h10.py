@@ -2,7 +2,7 @@ from typing import List, Optional
 from pydantic import BaseModel
 
 class H10Request(BaseModel):
-    ECG: List[float]
+    signal: List[int]
     id: Optional[str] = None
     measureTime: str = "0"
 

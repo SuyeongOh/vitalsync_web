@@ -2,7 +2,7 @@ from typing import List, Optional
 from pydantic import BaseModel
 
 class VerityRequest(BaseModel):
-    PPG: List[float]
+    signal: List[int]
     id: Optional[str] = None
     measureTime: str = "0"
 

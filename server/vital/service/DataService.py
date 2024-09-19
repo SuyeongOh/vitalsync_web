@@ -92,7 +92,7 @@ async def saveVeritySignal(verity_request: VerityRequest):
     # 데이터 생성 (string ID, Array<float> signal, long measurementTime)
     data = {
         "_id": verity_request.id,  # string 타입 ID
-        "signal": verity_request.PPG,  # float 배열 (Array<float>)
+        "signal": verity_request.signal,  # float 배열 (Array<float>)
         "measurementTime": verity_request.measureTime  # long 타입 measurementTime (유닉스 타임스탬프)
     }
     response = VerityResponse()
