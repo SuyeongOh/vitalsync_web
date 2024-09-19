@@ -1,12 +1,19 @@
 import pickle
 import sqlite3
 import io
+from http.client import responses
+
 import aiosqlite
 import numpy as np
 from datetime import datetime
+from pymongo import MongoClient
+from bson.objectid import ObjectId
+import time
+
 
 import server.vital
 from server.vital.db.ground_truth import GtRequest, GtResponse
+from server.vital.db.polar_verity import VerityRequest, VerityResponse
 from server.vital.db.vital import VitalResponse
 
 
@@ -75,6 +82,31 @@ async def savePpgSignal(user: str, ppg, r: list[float], g: list[float], b: list[
         await db.commit()
 
 
+# MongoDB에 연결
+# 데이터베이스와 컬렉션 선택
+client = MongoClient("mongodb://localhost:27017/")
+db = client['user']
+collection = db['polar_verity']
+
+async def saveVeritySignal(verity_request: VerityRequest):
+    # 데이터 생성 (string ID, Array<float> signal, long measurementTime)
+    data = {
+        "_id": verity_request.id,  # string 타입 ID
+        "signal": verity_request.PPG,  # float 배열 (Array<float>)
+        "measurementTime": verity_request.measureTime  # long 타입 measurementTime (유닉스 타임스탬프)
+    }
+    response = VerityResponse()
+    # 데이터 삽입
+    try:
+        collection.insert_one(data)
+        print("데이터가 성공적으로 저장되었습니다.")
+        response.status = 200
+        response.message = "saving ground truth success"
+    except Exception as e:
+        response.status = 200
+        response.message = e
+        print(f"데이터 삽입 중 오류 발생: {e}")
+    return response
 
 
 def saveGt(ground_truth: GtRequest):
@@ -125,3 +157,5 @@ def get_current_time_str():
     # strftime 메소드를 사용하여 원하는 형식의 문자열로 변환합니다.
     time_str = now.strftime('%Y%m%d%H%M')
     return time_str
+
+

@@ -7,6 +7,7 @@ from fastapi import FastAPI, HTTPException, status
 from server.vital.analysis.vital_calculator import VitalCalculator
 from server.vital.analysis.core.ppg import pos
 from server.vital.db.ground_truth import GtResponse, GtRequest
+from server.vital.db.polar_verity import VerityResponse, VerityRequest
 from server.vital.db.vital import VitalRequest, VitalResponse
 from server.vital.pipeline_package import preprocess_pipeline
 from server.vital.service import DataService
@@ -174,6 +175,11 @@ def calculate_bp(vital_request: VitalRequest):
     )
     return response
 
+
+@vitalService.post("/vital/verity", response_model=VerityResponse)
+def postVerity(verity_request: VerityRequest):
+    response = DataService.saveVeritySignal(verity_request)
+    return response
 
 @vitalService.post("/vital/gt", response_model=GtResponse)
 def postGT(gt_request: GtRequest):
