@@ -13,7 +13,7 @@ import time
 
 import server.vital
 from server.vital.db.ground_truth import GtRequest, GtResponse
-from server.vital.db.polar_verity import VerityRequest, VerityResponse
+from server.vital.db.polar import PolarRequest, PolarResponse
 from server.vital.db.vital import VitalResponse
 
 
@@ -88,20 +88,21 @@ client = MongoClient("mongodb://localhost:27017/")
 db = client['user']
 collection = db['polar_verity']
 
-async def saveVeritySignal(verity_request: VerityRequest):
+async def savePolarSignal(polar_request: PolarRequest):
     # 데이터 생성 (string ID, Array<float> signal, long measurementTime)
     data = {
-        "_id": verity_request.id,  # string 타입 ID
-        "signal": verity_request.signal,  # float 배열 (Array<float>)
-        "measurementTime": verity_request.measureTime  # long 타입 measurementTime (유닉스 타임스탬프)
+        "id": polar_request.id,  # string 타입 ID
+        "ecg": polar_request.ecg_signal,  # float 배열 (Array<float>)
+        "ppg": polar_request.ppg_signal,
+        "measurementTime": polar_request.measureTime  # long 타입 measurementTime (유닉스 타임스탬프)
     }
-    response = VerityResponse()
+    response = PolarResponse()
     # 데이터 삽입
     try:
         collection.insert_one(data)
         print("데이터가 성공적으로 저장되었습니다.")
         response.status = 200
-        response.message = "saving ground truth success"
+        response.message = "saving Polar Data success"
     except Exception as e:
         response.status = 200
         response.message = e

@@ -1,12 +1,13 @@
 from typing import List, Optional
 from pydantic import BaseModel
 
-class H10Request(BaseModel):
-    signal: List[int]
+class PolarRequest(BaseModel):
+    ppg_signal: List[int]
+    ecg_signal: List[int]
     id: Optional[str] = None
     measureTime: str = "0"
 
 
-class H10Response(BaseModel):
+class PolarResponse(BaseModel):
     status: int = 200
     message: str = "Success"
