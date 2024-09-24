@@ -105,7 +105,7 @@ async def savePolarSignal(polar_request: PolarRequest):
         response.message = "saving Polar Data success"
     except Exception as e:
         response.status = 200
-        response.message = e
+        response.message = "Error 발생 !!"
         print(f"데이터 삽입 중 오류 발생: {e}")
     return response
 
