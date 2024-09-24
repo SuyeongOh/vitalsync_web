@@ -176,8 +176,8 @@ def calculate_bp(vital_request: VitalRequest):
     return response
 
 
-@vitalService.post("/vital/verity", response_model=PolarResponse)
-def postVerity(polarRequest: PolarRequest):
+@vitalService.post("/vital/polar", response_model=PolarResponse)
+def postPolar(polarRequest: PolarRequest):
     response = DataService.savePolarSignal(polarRequest)
     return response
 
