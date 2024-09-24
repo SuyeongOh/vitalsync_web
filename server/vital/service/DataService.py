@@ -10,7 +10,6 @@ from pymongo import MongoClient
 from bson.objectid import ObjectId
 import time
 
-
 import server.vital
 from server.vital.db.ground_truth import GtRequest, GtResponse
 from server.vital.db.polar import PolarRequest, PolarResponse
@@ -88,7 +87,8 @@ client = MongoClient("mongodb://localhost:27017/")
 db = client['user']
 collection = db['polar_verity']
 
-async def savePolarSignal(polar_request: PolarRequest):
+
+def savePolarSignal(polar_request: PolarRequest):
     # 데이터 생성 (string ID, Array<float> signal, long measurementTime)
     data = {
         "id": polar_request.id,  # string 타입 ID
@@ -152,11 +152,10 @@ def saveGt(ground_truth: GtRequest):
         response.message = "internal error saving ground truth "
         return response
 
+
 def get_current_time_str():
     # 현재 시간을 datetime 객체로 가져옵니다.
     now = datetime.now()
     # strftime 메소드를 사용하여 원하는 형식의 문자열로 변환합니다.
     time_str = now.strftime('%Y%m%d%H%M')
     return time_str
-
-
