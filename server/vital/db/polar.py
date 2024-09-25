@@ -2,10 +2,10 @@ from typing import List, Optional
 from pydantic import BaseModel
 
 class PolarRequest(BaseModel):
-    ppg_signal: List[int]
-    ecg_signal: List[int]
+    ppg_signal: List[int] = []
+    ecg_signal: List[int] = []
     id: Optional[str] = None
-    measureTime: str = "0"
+    measurementTime = 0
 
 
 class PolarResponse(BaseModel):

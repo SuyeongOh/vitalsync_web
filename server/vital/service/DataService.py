@@ -92,7 +92,7 @@ def savePolarSignal(polar_request: PolarRequest):
     # 데이터 생성 (string ID, Array<float> signal, long measurementTime)
     data = {
         "id": polar_request.id,  # string 타입 ID
-        "measurementTime": polar_request.measureTime  # long 타입 measurementTime (유닉스 타임스탬프)
+        "measurementTime": polar_request.measurementTime  # long 타입 measurementTime (유닉스 타임스탬프)
     }
 
     if polar_request.ecg_signal:
