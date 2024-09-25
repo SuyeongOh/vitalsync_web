@@ -92,10 +92,15 @@ def savePolarSignal(polar_request: PolarRequest):
     # 데이터 생성 (string ID, Array<float> signal, long measurementTime)
     data = {
         "id": polar_request.id,  # string 타입 ID
-        "ecg": polar_request.ecg_signal,  # float 배열 (Array<float>)
-        "ppg": polar_request.ppg_signal,
         "measurementTime": polar_request.measureTime  # long 타입 measurementTime (유닉스 타임스탬프)
     }
+
+    if polar_request.ecg_signal:
+        data["ecg"] = polar_request.ecg_signal  # float 배열 (Array<float>)
+
+    if polar_request.ppg_signal:
+        data["ppg"] = polar_request.ppg_signal  # float 배열 (Array<float>)
+
     response = PolarResponse()
     # 데이터 삽입
     try:
