@@ -5,7 +5,7 @@ class PolarRequest(BaseModel):
     ppg_signal: List[int]
     ecg_signal: List[int]
     id: str = ""
-    measurementTime = 0
+    measurementTime : int
 
 
 class PolarResponse(BaseModel):
