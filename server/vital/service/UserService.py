@@ -12,7 +12,6 @@ userService = FastAPI()
 
 password = "1234"
 
-
 @userService.get("/login")
 async def login(user_id: str):
     conn = sqlite3.connect(server.vital.USER_DB_NAME)
@@ -31,7 +30,7 @@ async def login(user_id: str):
 
 @userService.post("/register")
 async def register(user: User):
-    conn = sqlite3.connect(USER_DB_NAME)
+    conn = sqlite3.connect(server.vital.USER_DB_NAME)
     cursor = conn.cursor()
     # 사용자 테이블 생성
     print('size : ' + str(cursor.arraysize))
@@ -56,7 +55,7 @@ async def register(user: User):
 
 @userService.get("/user/list")
 async def getUsers():
-    db = sqlite3.connect(USER_DB_NAME)
+    db = sqlite3.connect(server.vital.USER_DB_NAME)
     cursor = db.cursor()
 
     cursor.execute(userListQuery)
