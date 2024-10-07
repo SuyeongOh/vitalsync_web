@@ -70,16 +70,26 @@ class VitalCalculator:
         return masked_fft_hr_ppg
 
     def calc_ibi_hr(self):
-        self.peaks, self.ibis = peak_detection(self.bpf_ppg, self.fs, 45, 150,
-                                               windowsize=60 / self.fft_hr if self.fft_hr > 0 else 0.75)
-        hr_list = np.divide(60000, self.ibis)
-        self.ibi_hr = np.mean(hr_list)
+        try:
+            self.peaks, self.ibis = peak_detection(self.bpf_ppg, self.fs, 45, 150,
+                                                windowsize=60 / self.fft_hr if self.fft_hr > 0 else 0.75)
+            hr_list = np.divide(60000, self.ibis)
+            self.ibi_hr = np.mean(hr_list)
+        except Exception as e:
+            print("IBI error : ")
+            print(e)
+            self.ibi_hr = 0
         return self.ibi_hr
 
     def calc_hrv(self):
-        if self.ibis is None:
-            self.calc_ibi_hr()
-        self.hrv = np.std(self.ibis)
+        try:
+            if self.ibis is None:
+                self.calc_ibi_hr()
+            self.hrv = np.std(self.ibis)
+        except Exception as e:
+            print("hrv error")
+            print(e)
+            self.hrv = 0
 
         return self.hrv
 
@@ -92,18 +102,23 @@ class VitalCalculator:
         return self.hrv_confidence
 
     def calc_baevsky_stress_index(self):
-        smallest = np.min(self.ibis)
-        highest = np.max(self.ibis)
-        hist, bin_edges = np.histogram(self.ibis, bins=np.arange(smallest, highest, 50))
+        try:
+            smallest = np.min(self.ibis)
+            highest = np.max(self.ibis)
+            hist, bin_edges = np.histogram(self.ibis, bins=np.arange(smallest, highest, 50))
 
-        mode_index = np.argmax(hist)
-        mode_bin = bin_edges[mode_index]
-        mode_frequency = hist[mode_index]
-        total_rr_intervals = len(self.ibis)
+            mode_index = np.argmax(hist)
+            mode_bin = bin_edges[mode_index]
+            mode_frequency = hist[mode_index]
+            total_rr_intervals = len(self.ibis)
 
-        amo = (mode_frequency / total_rr_intervals) * 100
+            amo = (mode_frequency / total_rr_intervals) * 100
 
-        self.b_si = np.sqrt(amo / (2 * mode_bin) * (highest - smallest))
+            self.b_si = np.sqrt(amo / (2 * mode_bin) * (highest - smallest))
+        except Exception as e:
+            print("stress error")
+            print(e)
+            self.b_si = -1
         return self.b_si
 
     def calc_lfhf(self):
