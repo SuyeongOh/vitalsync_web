@@ -1,6 +1,7 @@
 import pickle
 import sqlite3
 import io
+import urllib
 from http.client import responses
 
 import aiosqlite
@@ -83,7 +84,9 @@ async def savePpgSignal(user: str, ppg, r: list[float], g: list[float], b: list[
 
 # MongoDB에 연결
 # 데이터베이스와 컬렉션 선택
-client = MongoClient("mongodb://localhost:27017/")
+username = urllib.parse.quote_plus('admin')
+password = urllib.parse.quote_plus('1234')
+client = MongoClient('mongodb://%s:%s@localhost:27017/' % (username, password))
 db = client['user']
 collection = db['polar_verity']
 
