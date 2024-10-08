@@ -98,6 +98,8 @@ def savePolarSignal(polar_request: PolarRequest):
         "measurementTime": polar_request.measurementTime  # long 타입 measurementTime (유닉스 타임스탬프)
     }
 
+    if not (polar_request.ecg_signal and polar_request.ppg_signal):
+        return
     if polar_request.ecg_signal:
         data["ecg"] = polar_request.ecg_signal  # float 배열 (Array<float>)
 
