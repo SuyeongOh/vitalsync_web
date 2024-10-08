@@ -72,11 +72,11 @@ def process_json_data(data):
 
 
 # Step 4: 결과 출력
-filename = 'VitalSignal.json'
+filename = 'VitalSignal_20241008.json'
 json_data = load_json_file(filename)
 processed_data = process_json_data(json_data)
 
-test_data = processed_data["ku_014_20241007132649"]
+test_data = processed_data["innopia1_20241008173158"]
 # Calculate PPG
 original_RGB = [
     test_data["r_signal"],
@@ -87,10 +87,18 @@ RGB = np.asarray(original_RGB).transpose(1, 0)
 RGB = preprocess_pipeline.apply(RGB)
 
 # Calculate PPG
-pred_ppg = omit.OMIT(RGB)
-#pred_ppg = pos.POS(RGB, 30)
+#pred_ppg = omit.OMIT(RGB)
+pred_ppg = pos.POS(RGB, 30)
+
+nan_indices = np.isnan(pred_ppg)  # NaN 값이 있는 위치를 True로 표시
+if nan_indices.any():
+    first_nan_index = np.where(nan_indices)[0][0]  # 첫 번째 NaN 값의 인덱스
+    slice_arr = pred_ppg[:first_nan_index]  # 첫 번째 NaN 이전까지만 자르기
+else:
+    slice_arr = pred_ppg  # NaN이 없으면 원래 배열 그대로
+
 # Calculate Vital
-vitalcalc = VitalCalculator(pred_ppg, 30)
+vitalcalc = VitalCalculator(slice_arr, 30)
 fft_hr = vitalcalc.calc_fft_hr()
 ibi_hr = vitalcalc.calc_ibi_hr()
 hrv = vitalcalc.calc_hrv()
