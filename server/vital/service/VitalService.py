@@ -5,7 +5,7 @@ import numpy as np
 from fastapi import FastAPI, HTTPException, status
 
 from server.vital.analysis.vital_calculator import VitalCalculator
-from server.vital.analysis.core.ppg import pos
+from server.vital.analysis.core.ppg import pos, omit
 from server.vital.db.ground_truth import GtResponse, GtRequest
 from server.vital.db.polar import PolarResponse, PolarRequest
 from server.vital.db.vital import VitalRequest, VitalResponse
@@ -29,7 +29,8 @@ async def calculate_vital(vital_request: VitalRequest):
 
     # Calculate PPG
     pred_ppg = pos.POS(RGB, 30)
-
+    if np.isnan(pred_ppg).any():
+        pred_ppg = omit.OMIT(RGB)
     # Calculate Vital
     vitalcalc = VitalCalculator(pred_ppg, 30)
     fft_hr = vitalcalc.calc_fft_hr()
