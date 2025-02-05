@@ -86,9 +86,12 @@ async def savePpgSignal(user: str, ppg, r: list[float], g: list[float], b: list[
 # 데이터베이스와 컬렉션 선택
 username = urllib.parse.quote_plus('admin')
 password = urllib.parse.quote_plus('1234')
-client = MongoClient('mongodb://%s:%s@localhost:27017/' % (username, password))
-db = client['user']
-collection = db['polar_verity']
+client = MongoClient(host='localhost', port=27017,
+                     username=username,
+                     password=password)
+
+db = client.get_database(name='user')
+collection = db.get_collection(name='polar_verity')
 
 
 def savePolarSignal(polar_request: PolarRequest):
