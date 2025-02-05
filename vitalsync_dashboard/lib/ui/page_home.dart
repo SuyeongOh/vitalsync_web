@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vitalsync_dashboard/ui/page_main.dart';
+import 'package:vitalsync_dashboard/ui/page_userlist.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -7,8 +8,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  MainPage body = MainPage();
-
+  Widget body = MainPage();
 
   @override
   Widget build(BuildContext context) {
@@ -27,15 +27,19 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             ListTile(
-              title: Text('Users'),
+              title: Text('User List'),
               onTap: () {
-                Navigator.pushNamed(context, "/user/list");
+                setState(() {
+                  body = UserListPage();
+                });
+                Navigator.pop(context);
               },
             ),
             ListTile(
               title: Text('Data'),
               onTap: () {
                 Navigator.pushNamed(context, "/user/data");
+                Navigator.pop(context);
               },
             ),
           ],

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vitalsync_dashboard/ui/page_data.dart';
-import 'package:vitalsync_dashboard/ui/page_user.dart';
+import 'package:vitalsync_dashboard/ui/page_userlist.dart';
 import 'package:vitalsync_dashboard/ui/page_home.dart';
 
 void main() {
@@ -17,8 +17,8 @@ class VitalSyncDashBoard extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/' : (context) => HomePage(),
-        '/user/list' : (context) => UserPage(),
-        '/user/data' : (context) => DataPage()
+        '/user/list' : (context) => UserListPage(),
+        //'/user/data' : (context) => DataPage(userID: userID)
       },
     );
   }
