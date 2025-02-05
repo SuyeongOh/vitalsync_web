@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vitalsync_dashboard/ui/page_main.dart';
+import 'package:vitalsync_dashboard/ui/page_register.dart';
 import 'package:vitalsync_dashboard/ui/page_userlist.dart';
 
 class HomePage extends StatefulWidget {
@@ -36,9 +37,11 @@ class _HomePageState extends State<HomePage> {
               },
             ),
             ListTile(
-              title: Text('Data'),
+              title: Text('Register'),
               onTap: () {
-                Navigator.pushNamed(context, "/user/data");
+                setState(() {
+                  body = RegisterPage();
+                });
                 Navigator.pop(context);
               },
             ),

@@ -6,8 +6,6 @@ import 'package:vitalsync_dashboard/ui/page_data.dart';
 import '../database/user_list_data.dart';
 import '../service/http_service.dart';
 
-const String BASE_URL = "https://your-api.com/"; // 여기에 실제 API 주소 입력
-
 class UserListPage extends StatefulWidget {
   @override
   _UserListPageState createState() => _UserListPageState();

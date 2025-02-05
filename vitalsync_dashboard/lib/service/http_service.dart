@@ -11,7 +11,8 @@ Future<List<UserListData>> fetchUserList() async {
   final response = await http.get(Uri.parse(BASE_URL + api));
   if (response.statusCode == 200) {
     List<dynamic> dataJson = jsonDecode(response.body);
-    List<UserListData> userList = dataJson.map((data) => UserListData.fromJson(data)).toList();
+    List<UserListData> userList =
+        dataJson.map((data) => UserListData.fromJson(data)).toList();
     Config.instance.users = userList;
     return userList;
   } else {
@@ -23,17 +24,42 @@ Future<List<UserData>> fetchUserData(String user_id) async {
   String api = "vital/data/vital";
   final response = await http.get(Uri.parse("$BASE_URL$api?user_id=$user_id"));
 
-  if(response.statusCode == 200){
+  if (response.statusCode == 200) {
     List<dynamic> dataJson = jsonDecode(response.body);
-    List<UserData> userData = dataJson.map((data) => UserData.fromJson(data)).toList();
+    List<UserData> userData =
+        dataJson.map((data) => UserData.fromJson(data)).toList();
 
     Config.instance.userData = userData;
 
     return userData;
-  } else{
+  } else {
     throw Exception(response.body);
   }
 }
 
+Future<bool> registerUser({
+  required String userId,
+  required String password,
+  required String name,
+  required String email,
+}) async {
+  Map<String, dynamic> userData = {
+    "user_id": userId,
+    "password": password,
+    "name": name,
+    "email": email,
+  };
 
+  String api = "/register";
+  final response = await http.post(
+    Uri.parse("$BASE_URL$api"),
+    headers: {"Content-Type": "application/json"},
+    body: jsonEncode(userData),
+  );
 
+  if (response.statusCode == 201) {
+    return true; // 회원가입 성공
+  } else {
+    return false; // 회원가입 실패
+  }
+}
