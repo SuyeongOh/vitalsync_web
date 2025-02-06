@@ -150,6 +150,8 @@ def blob_to_floatlist(blob_data):
             continue  # 무시하고 다음 데이터로 진행
 
         float_value = struct.unpack('f', binary_data)[0]
+        if float_value == float("nan") or float_value == float("inf") or float_value == float("-inf"):
+            continue
         float_array.append(float_value)
 
     return float_array
