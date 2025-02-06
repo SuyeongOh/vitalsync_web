@@ -91,6 +91,13 @@ async def getData(user_id: str):
     return jsonData
 
 
+SIGNAL_LIST = [
+    'ppg',
+    'r_signal',
+    'g_signal',
+    'b_signal'
+]
+
 @userService.get("/vital/data/signal")
 async def getPpgSignal(user_id: str):
     db = sqlite3.connect(DATA_DB_NAME)
@@ -105,10 +112,7 @@ async def getPpgSignal(user_id: str):
     for e in data:
         parseData = {}
         for field, value in zip(fields, e):
-            if(field == 'ppg'
-                    or field == 'r_signal'
-                    or field == 'g_signal'
-                    or field == 'b_signal'):
+            if field in SIGNAL_LIST:
                 parseData[field] = blob_to_floatlist(value)
             parseData[field] = value
         jsonData.append(parseData)
@@ -116,8 +120,6 @@ async def getPpgSignal(user_id: str):
     #TODO blob -> float array issue 해결
 
     return jsonData
-
-
 
 
 @userService.get("/vital/data/gt")
@@ -144,8 +146,12 @@ def blob_to_floatlist(blob_data):
 
     for i in range(0, len(blob_data), unit_size):
         binary_data = blob_data[i:i + unit_size]
+        if len(binary_data) < unit_size:
+            print(f"Skipping incomplete float data at index {i}: {binary_data}")
+            continue  # 무시하고 다음 데이터로 진행
 
         float_value = struct.unpack('f', binary_data)[0]
         float_array.append(float_value)
+    print(f'unpack array :: {float_array}')
 
     return float_array
