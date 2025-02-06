@@ -10,6 +10,9 @@ signalSaveQuery = '''INSERT INTO VitalSignal
 
 signalLoadQuery = '''SELECT * FROM VitalSignal WHERE UserID = ?'''
 
+signalWithTimeLoadQuery = '''SELECT * FROM VitalSignal WHERE UserID = ? AND MeasurementTime = ?'''
+
+
 gtSaveQuery = '''INSERT INTO GroundTruth
                   (UserID, ppg, r_signal, g_signal, b_signal, MeasurementTime)
                   VALUES (?, ?, ?, ?, ?, ?)'''

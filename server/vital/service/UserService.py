@@ -122,6 +122,28 @@ async def getPpgSignal(user_id: str):
 
     return jsonData
 
+@userService.get("/vital/data/signal")
+async def getPpgTimeSignal(user_id: str, measurementTime: str):
+    db = sqlite3.connect(DATA_DB_NAME)
+    cursor = db.cursor()
+
+    cursor.execute(signalWithTimeLoadQuery, (user_id, measurementTime))
+
+    data = cursor.fetchall()
+    fields = [description[0] for description in cursor.description]
+    jsonData = []
+    if len(data) > 1 :
+        data = data[-1]
+    parseData = {}
+    for field, value in zip(fields, data):
+        if field in SIGNAL_LIST:
+            parseData[field] = blob_to_floatlist(value)
+    jsonData.append(parseData)
+
+    #TODO blob -> float array issue 해결
+
+    return jsonData
+
 
 @userService.get("/vital/data/gt")
 def getGT(user_id: str):
