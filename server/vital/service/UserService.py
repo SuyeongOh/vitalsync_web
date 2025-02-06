@@ -183,7 +183,7 @@ def blob_to_floatlist(blob_data):
 
     return float_array
 
-async def main():
-    await getPpgTimeSignal("admin", "20240806140651")
-
-asyncio.run(main())
+# async def main():
+#     await getPpgTimeSignal("admin", "20240806140651")
+#
+# asyncio.run(main())
