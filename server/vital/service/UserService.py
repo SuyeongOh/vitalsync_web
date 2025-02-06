@@ -122,7 +122,7 @@ async def getPpgSignal(user_id: str):
 
     return jsonData
 
-@userService.get("/vital/data/signal")
+@userService.get("/vital/data/signal_time")
 async def getPpgTimeSignal(user_id: str, measurementTime: str):
     db = sqlite3.connect(DATA_DB_NAME)
     cursor = db.cursor()
