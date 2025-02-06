@@ -132,7 +132,7 @@ async def getPpgTimeSignal(user_id: str, measurementTime: str):
     data = cursor.fetchall()
     fields = [description[0] for description in cursor.description]
     jsonData = []
-    if len(data) > 1 :
+    if data :
         data = data[-1]
     parseData = {}
     for field, value in zip(fields, data):
@@ -164,6 +164,8 @@ def getGT(user_id: str):
 
 
 def blob_to_floatlist(blob_data):
+    if type(blob_data) != bytes:
+        return blob_data
     unit_size = 4
     float_array = []
 
@@ -181,3 +183,7 @@ def blob_to_floatlist(blob_data):
 
     return float_array
 
+async def main():
+    await getPpgTimeSignal("admin", "20240806140651")
+
+asyncio.run(main())
