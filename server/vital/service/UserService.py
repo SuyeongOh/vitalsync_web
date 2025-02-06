@@ -97,7 +97,8 @@ SIGNAL_LIST = [
     'ppg',
     'r_signal',
     'g_signal',
-    'b_signal'
+    'b_signal',
+    'MeasurementTime'
 ]
 
 @userService.get("/vital/data/signal")
@@ -158,3 +159,9 @@ def blob_to_floatlist(blob_data):
 
     return float_array
 
+
+async def main():
+    await getPpgSignal("admin")
+
+
+asyncio.run(main())
