@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vitalsync_dashboard/ui/page_data.dart'; // Graph 페이지
+import 'package:vitalsync_dashboard/ui/page_history.dart';
 import '../database/user_list_data.dart';
 import '../service/http_service.dart';
 
@@ -118,9 +119,11 @@ class _UserListPageState extends State<UserListPage> {
                             textStyle: TextStyle(fontSize: 12),
                           ),
                           onPressed: () {
-                            // TODO: 히스토리 페이지로 이동하도록 구현
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text("History 기능 추가 필요")),
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => UserHistoryPage(userID: displayedUsers[index].user_id),
+                              ),
                             );
                           },
                         ),
