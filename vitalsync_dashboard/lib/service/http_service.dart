@@ -84,15 +84,18 @@ Future<UserSignalData> fetchUserSignalData(String user_id) async {
 }
 
 Future<UserSignalUnitData> fetchUserSignalDataWithTime(String user_id, String measurementTime) async {
-  String api = "vital/data/signal";
+  String api = "vital/data/signal_time";
   final response = await http.get(Uri.parse("$BASE_URL$api?user_id=$user_id&measurementTime=$measurementTime"));
 
   if (response.statusCode == 200) {
-    Map<String, dynamic> dataJson = jsonDecode(response.body);
+    List<dynamic> dataJson = jsonDecode(response.body);
 
-    UserSignalUnitData userSignalData = UserSignalUnitData.fromJson(dataJson);
+    if (dataJson.isNotEmpty){
+      UserSignalUnitData userSignalData = UserSignalUnitData.fromJson(dataJson.first);
+      return userSignalData;
+    }
+    throw Exception("No data found for $user_id at $measurementTime");
 
-    return userSignalData;
   } else {
     throw Exception("Failed to load data: ${response.body}");
   }
