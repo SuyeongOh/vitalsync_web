@@ -97,7 +97,8 @@ SIGNAL_LIST = [
     'ppg',
     'r_signal',
     'g_signal',
-    'b_signal'
+    'b_signal',
+    'MeasurementTime'
 ]
 
 @userService.get("/vital/data/signal")
