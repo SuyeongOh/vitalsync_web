@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'package:vitalsync_dashboard/ui/page_data.dart';
-
+import 'package:vitalsync_dashboard/ui/page_data.dart'; // Graph 페이지
 import '../database/user_list_data.dart';
 import '../service/http_service.dart';
 
@@ -11,15 +8,14 @@ class UserListPage extends StatefulWidget {
   _UserListPageState createState() => _UserListPageState();
 }
 
-
 class _UserListPageState extends State<UserListPage> {
   late Future<List<UserListData>> futureUsers;
   List<UserListData> allUsers = []; // 전체 사용자 목록
   List<UserListData> filteredUsers = []; // 검색된 사용자 목록
   TextEditingController searchController = TextEditingController();
 
-  int currentPage = 0; // 현재 페이지 번호
-  static const int pageSize = 10; // 한 페이지당 표시할 아이템 수
+  int currentPage = 0;
+  static const int pageSize = 10;
 
   @override
   void initState() {
@@ -27,7 +23,7 @@ class _UserListPageState extends State<UserListPage> {
     fetchUserList().then((users) {
       setState(() {
         allUsers = users;
-        filteredUsers = users; // 초기 리스트 설정
+        filteredUsers = users;
       });
     });
   }
@@ -74,7 +70,7 @@ class _UserListPageState extends State<UserListPage> {
               "User List",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-            SizedBox(width: 50), // User List와 검색창 간격
+            SizedBox(width: 50),
             Flexible(
               child: Container(
                 width: 400,
@@ -110,14 +106,44 @@ class _UserListPageState extends State<UserListPage> {
                     leading: CircleAvatar(child: Text(displayedUsers[index].user_id[0])),
                     title: Text(displayedUsers[index].user_id),
                     subtitle: Text(displayedUsers[index].name),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => DataPage(userID: displayedUsers[index].user_id),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // History 버튼
+                        ElevatedButton.icon(
+                          icon: Icon(Icons.history, size: 18),
+                          label: Text("History"),
+                          style: ElevatedButton.styleFrom(
+                            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            textStyle: TextStyle(fontSize: 12),
+                          ),
+                          onPressed: () {
+                            // TODO: 히스토리 페이지로 이동하도록 구현
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text("History 기능 추가 필요")),
+                            );
+                          },
                         ),
-                      );
-                    },
+                        SizedBox(width: 8),
+                        // Graph 버튼
+                        ElevatedButton.icon(
+                          icon: Icon(Icons.show_chart, size: 18),
+                          label: Text("Graph"),
+                          style: ElevatedButton.styleFrom(
+                            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            textStyle: TextStyle(fontSize: 12),
+                          ),
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => DataPage(userID: displayedUsers[index].user_id),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                 );
               },
