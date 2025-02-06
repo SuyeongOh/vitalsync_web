@@ -4,8 +4,6 @@ import 'package:vitalsync_dashboard/config.dart';
 import 'package:vitalsync_dashboard/database/user_data.dart';
 import 'package:vitalsync_dashboard/database/user_list_data.dart';
 
-import '../database/user_signal_data.dart';
-
 String BASE_URL = "http://35.220.206.239:3000/";
 
 Future<List<UserListData>> fetchUserList() async {
@@ -63,22 +61,5 @@ Future<bool> registerUser({
     return true; // 회원가입 성공
   } else {
     return false; // 회원가입 실패
-  }
-}
-
-Future<List<UserSignalData>> fetchUserSignalData(String user_id) async {
-  String api = "vital/data/signal";
-  final response = await http.get(Uri.parse("$BASE_URL$api?user_id=$user_id"));
-
-  if (response.statusCode == 200) {
-    List<dynamic> dataJson = jsonDecode(response.body);
-    List<UserSignalData> userSignalData =
-    dataJson.map((data) => UserSignalData.fromJson(data)).toList();
-
-    Config.instance.signalData = userSignalData;
-
-    return userSignalData;
-  } else {
-    throw Exception(response.body);
   }
 }
