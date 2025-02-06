@@ -1,3 +1,4 @@
+import asyncio
 import json
 import struct
 
@@ -107,14 +108,12 @@ async def getPpgSignal(user_id: str):
 
     data = cursor.fetchall()
     fields = [description[0] for description in cursor.description]
-    print(fields)
     jsonData = []
     for e in data:
         parseData = {}
         for field, value in zip(fields, e):
             if field in SIGNAL_LIST:
                 parseData[field] = blob_to_floatlist(value)
-            parseData[field] = value
         jsonData.append(parseData)
 
     #TODO blob -> float array issue 해결
@@ -152,6 +151,5 @@ def blob_to_floatlist(blob_data):
 
         float_value = struct.unpack('f', binary_data)[0]
         float_array.append(float_value)
-    print(f'unpack array :: {float_array}')
 
     return float_array
