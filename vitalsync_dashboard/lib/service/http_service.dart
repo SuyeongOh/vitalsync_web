@@ -66,19 +66,34 @@ Future<bool> registerUser({
   }
 }
 
-Future<List<UserSignalData>> fetchUserSignalData(String user_id) async {
+Future<UserSignalData> fetchUserSignalData(String user_id) async {
   String api = "vital/data/signal";
   final response = await http.get(Uri.parse("$BASE_URL$api?user_id=$user_id"));
 
   if (response.statusCode == 200) {
-    List<dynamic> dataJson = jsonDecode(response.body);
-    List<UserSignalData> userSignalData =
-    dataJson.map((data) => UserSignalData.fromJson(data)).toList();
+    Map<String, dynamic> dataJson = jsonDecode(response.body);
+
+    UserSignalData userSignalData = UserSignalData.fromJson(dataJson);
+    userSignalData.setUserId(user_id);
 
     Config.instance.signalData = userSignalData;
+    return userSignalData;
+  } else {
+    throw Exception("Failed to load data: ${response.body}");
+  }
+}
+
+Future<UserSignalUnitData> fetchUserSignalDataWithTime(String user_id, String measurementTime) async {
+  String api = "vital/data/signal";
+  final response = await http.get(Uri.parse("$BASE_URL$api?user_id=$user_id&measurementTime=$measurementTime"));
+
+  if (response.statusCode == 200) {
+    Map<String, dynamic> dataJson = jsonDecode(response.body);
+
+    UserSignalUnitData userSignalData = UserSignalUnitData.fromJson(dataJson);
 
     return userSignalData;
   } else {
-    throw Exception(response.body);
+    throw Exception("Failed to load data: ${response.body}");
   }
 }

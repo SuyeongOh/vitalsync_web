@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vitalsync_dashboard/ui/page_signal.dart';
 import '../database/user_data.dart';
 import '../service/http_service.dart';
 
@@ -80,7 +81,14 @@ class _UserHistoryPageState extends State<UserHistoryPage> {
                     UserData data = paginatedUserData[index];
                     return GestureDetector(
                       onTap: () {
-
+                        Navigator.push(context,
+                            MaterialPageRoute(
+                              builder: (context) => SignalDataPage(
+                                userID: data.userID,
+                                measurementTime: data.measurementTime,
+                              ),
+                            )
+                        );
                       },
                       child: Card(
                         margin: EdgeInsets.symmetric(vertical: 6, horizontal: 16),

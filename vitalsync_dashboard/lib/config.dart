@@ -5,7 +5,7 @@ import 'package:vitalsync_dashboard/database/user_signal_data.dart';
 class Config{
   List<UserListData> users = [];
   List<UserData> userData = [];
-  List<UserSignalData> signalData = [];
+  late UserSignalData signalData;
   static Config instance = Config();
 
 }
