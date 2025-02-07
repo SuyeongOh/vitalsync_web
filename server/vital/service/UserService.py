@@ -7,6 +7,9 @@ from pickle import UnpicklingError
 import numpy as np
 from fastapi import FastAPI, HTTPException, status
 import sqlite3
+
+from fastapi.encoders import jsonable_encoder
+
 import server.vital.db.user
 from server.vital.db.user import User
 from server.vital.service import *
@@ -133,16 +136,11 @@ async def getPpgTimeSignal(user_id: str, measurementTime: str):
 
     data = cursor.fetchone()
     fields = [description[0] for description in cursor.description]
-    jsonData = []
     parseData = {}
     for field, value in zip(fields, data):
         if field in SIGNAL_LIST:
             parseData[field] = blob_to_floatlist(value)
-    jsonData.append(parseData)
-
-    #TODO blob -> float array issue 해결
-
-    return jsonData
+    return parseData
 
 
 @userService.get("/vital/data/gt")
@@ -167,14 +165,13 @@ def blob_to_floatlist(blob_data):
     if type(blob_data) != bytes:
         return blob_data
 
-    print(blob_data)
     try:
         float_data = pickle.loads(blob_data)
     except UnpicklingError as e :
-        float_data = np.frombuffer(blob_data, dtype=np.float64)
+        float_data = np.frombuffer(blob_data, dtype=np.float64).tolist()
     return float_data
 
-# async def main():
-#     await getPpgTimeSignal("admin", "20241107085424")
-#
-# asyncio.run(main())
+async def main():
+    await getPpgTimeSignal("admin", "20241107085424")
+
+asyncio.run(main())
