@@ -2,7 +2,9 @@ import asyncio
 import pickle
 import math
 import struct
+from pickle import UnpicklingError
 
+import numpy as np
 from fastapi import FastAPI, HTTPException, status
 import sqlite3
 import server.vital.db.user
@@ -129,11 +131,9 @@ async def getPpgTimeSignal(user_id: str, measurementTime: str):
 
     cursor.execute(signalWithTimeLoadQuery, (user_id, measurementTime))
 
-    data = cursor.fetchall()
+    data = cursor.fetchone()
     fields = [description[0] for description in cursor.description]
     jsonData = []
-    if data :
-        data = data[-1]
     parseData = {}
     for field, value in zip(fields, data):
         if field in SIGNAL_LIST:
@@ -167,9 +167,14 @@ def blob_to_floatlist(blob_data):
     if type(blob_data) != bytes:
         return blob_data
 
-    return pickle.loads(blob_data)
+    print(blob_data)
+    try:
+        float_data = pickle.loads(blob_data)
+    except UnpicklingError as e :
+        float_data = np.frombuffer(blob_data, dtype=np.float64)
+    return float_data
 
-# async def main():
-#     await getPpgTimeSignal("admin", "20240806140651")
-#
-# asyncio.run(main())
+async def main():
+    await getPpgTimeSignal("admin", "20241107085424")
+
+asyncio.run(main())
