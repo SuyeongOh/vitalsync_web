@@ -174,7 +174,7 @@ def blob_to_floatlist(blob_data):
         float_data = np.frombuffer(blob_data, dtype=np.float64)
     return float_data
 
-async def main():
-    await getPpgTimeSignal("admin", "20241107085424")
-
-asyncio.run(main())
+# async def main():
+#     await getPpgTimeSignal("admin", "20241107085424")
+#
+# asyncio.run(main())
