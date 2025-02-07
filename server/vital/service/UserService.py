@@ -1,5 +1,5 @@
 import asyncio
-import json
+import pickle
 import math
 import struct
 
@@ -166,22 +166,8 @@ def getGT(user_id: str):
 def blob_to_floatlist(blob_data):
     if type(blob_data) != bytes:
         return blob_data
-    unit_size = 4
-    float_array = []
 
-    for i in range(0, len(blob_data), unit_size):
-        binary_data = blob_data[i:i + unit_size]
-        if len(binary_data) < unit_size:
-            print(f"Skipping incomplete float data at index {i}: {binary_data}")
-            continue  # 무시하고 다음 데이터로 진행
-
-        float_value = struct.unpack('f', binary_data)[0]
-        if math.isnan(float_value) or float_value == float("inf") or float_value == float("-inf"):
-            print(f"Nan !!")
-            continue
-        float_array.append(float_value)
-
-    return float_array
+    return pickle.loads(blob_data)
 
 # async def main():
 #     await getPpgTimeSignal("admin", "20240806140651")

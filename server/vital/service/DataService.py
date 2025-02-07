@@ -1,15 +1,10 @@
 import pickle
 import sqlite3
-import io
 import urllib
-from http.client import responses
+from datetime import datetime
 
 import aiosqlite
-import numpy as np
-from datetime import datetime
 from pymongo import MongoClient
-from bson.objectid import ObjectId
-import time
 
 import server.vital
 from server.vital.db.ground_truth import GtRequest, GtResponse
