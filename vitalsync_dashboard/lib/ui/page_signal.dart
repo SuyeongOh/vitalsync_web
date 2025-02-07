@@ -22,21 +22,22 @@ class _SignalDataPageState extends State<SignalDataPage> {
   Map<String, bool> selectedData = {}; // 체크된 데이터 목록
   Map<String, Color> dataColors = {}; // 데이터별 색상 매핑
 
-  int minY = 0;
-  int maxY = 255;
+  double maxY = 255;
+  double minY = 0;
+
+  double maxPpg = 5;
+  double minPpg = -5;
 
   @override
   void initState() {
     super.initState();
     initializeDataSelection();
-
-    signalData =
-        fetchUserSignalDataWithTime(widget.userID, widget.measurementTime);
+    signalData = fetchUserSignalDataWithTime(widget.userID, widget.measurementTime);
   }
 
   void initializeDataSelection() {
     List<String> labels = UserSignalUnitData.getDataLabels();
-    List<Color> colors = [Colors.black, Colors.red, Colors.green, Colors.blue];
+    List<Color> colors = [Colors.cyan, Colors.red, Colors.green, Colors.blue];
 
     for (int i = 0; i < labels.length; i++) {
       selectedData[labels[i]] = false; // 기본값 false로 설정
@@ -44,24 +45,41 @@ class _SignalDataPageState extends State<SignalDataPage> {
     }
   }
 
+  List<double> normalizePpgData(List<double> data) {
+    return data.map((ppgValue) {
+      return minY + ((ppgValue - minPpg) / (maxPpg - minPpg)) * (maxY - minY);
+    }).toList();
+  }
+
   void updateRangeY(UserSignalUnitData signalData) {
     List<double> selectedValues = selectedData.entries
-        .where((entry) => entry.value) // 체크된 항목만 필터링
-        .expand((entry) => getSignalData(signalData, entry.key)) // 데이터 가져오기
+        .where((entry) => entry.value) // ppg 제외한 값만 사용
+        .expand((entry) => getSignalData(signalData, entry.key))
         .toList();
 
-    if (selectedValues.isNotEmpty) {
-      double minValue = selectedValues.reduce((a, b) => a < b ? a : b);
-      double maxValue = selectedValues.reduce((a, b) => a > b ? a : b);
+    if (selectedData['ppg'] ?? false) {
+      double minValue = signalData.ppg.reduce(min);
+      double maxValue = signalData.ppg.reduce(max);
       double range = (maxValue - minValue) * 0.05;
 
       setState(() {
-        minY = (minValue - range).floor();
-        maxY = (maxValue + range).ceil();
+        minPpg = (minValue - range);
+        maxPpg = (maxValue + range);
+      });
+    }
+
+    if (selectedValues.isNotEmpty) {
+      double minValue = selectedValues.reduce(min);
+      double maxValue = selectedValues.reduce(max);
+      double range = (maxValue - minValue) * 0.05;
+
+      setState(() {
+        minY = (minValue - range);
+        maxY = (maxValue + range);
       });
     } else {
       setState(() {
-        minY = -255; // 기본값으로 초기화
+        minY = 0;
         maxY = 255;
       });
     }
@@ -69,6 +87,7 @@ class _SignalDataPageState extends State<SignalDataPage> {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(title: Text("${widget.userID}'s Signal Data Graph")),
       body: FutureBuilder<UserSignalUnitData>(
@@ -103,7 +122,7 @@ class _SignalDataPageState extends State<SignalDataPage> {
                           setState(() {
                             selectedData[label] = value ?? false;
                           });
-                          updateRangeY(signalData); // 선택된 데이터 기반으로 minY 업데이트
+                          updateRangeY(signalData); // 선택된 데이터 기반으로 min/max 업데이트
                         },
                       ),
                       Text(label.toUpperCase(), style: TextStyle(fontSize: 16)),
@@ -119,16 +138,86 @@ class _SignalDataPageState extends State<SignalDataPage> {
                   padding: const EdgeInsets.all(16.0),
                   child: LineChart(
                     LineChartData(
-                      minY: minY - 1, // 데이터 최소값 설정
-                      maxY: maxY + 1, // 데이터 최대값 설정
+                      minY: minY, // minY 조정
+                      maxY: maxY, // maxY 조정
                       titlesData: FlTitlesData(
-                        bottomTitles: AxisTitles(
+                        rightTitles: AxisTitles(
                           sideTitles: SideTitles(
-                            showTitles: false, // X축 타이틀 숨김
+                            showTitles: true, //
+                            reservedSize: 50, //
+                            interval: (maxY - minY) / 20,
+                            getTitlesWidget: (value, meta) {
+                              if (meta.max == value) {
+                                return Padding(
+                                  padding: EdgeInsets.fromLTRB(0, 0, 8, 20),
+                                  child: Text(
+                                    "COLOR",  //
+                                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black),
+                                    textAlign: TextAlign.left,
+                                  ),
+                                );
+                              }
+                              return Padding(
+                                padding: EdgeInsets.only(left: 8),
+                                child: Text(
+                                  value.toInt().toString(), //
+                                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold), //
+                                  textAlign: TextAlign.left, //
+                                ),
+                              );
+                            },
                           ),
                         ),
                         leftTitles: AxisTitles(
-                          sideTitles: SideTitles(showTitles: true), // Y축 타이틀 표시
+                          sideTitles: SideTitles(
+                            showTitles: true, // selectedData['ppg'] ?? false, // ppg 체크 시만 Y축 레이블 표시
+                            reservedSize: 50, // Y축 공간 확보
+                            getTitlesWidget: (value, meta) {
+                              double mappedValue = minPpg + ((value - minY) / (maxY - minY)) * (maxPpg - minPpg);
+
+                              if (meta.max == value) {
+                                return Padding(
+                                  padding: EdgeInsets.fromLTRB(8, 0, 0, 16),
+                                  child: Text(
+                                    "PPG",
+                                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black),
+                                    textAlign: TextAlign.right,
+                                  ),
+                                );
+                              }
+                              return Padding(
+                                padding: EdgeInsets.only(right: 8),
+                                child: Text(
+                                  mappedValue.toStringAsFixed(3),
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    color: selectedData['ppg'] ?? false ? Colors.black : Colors.transparent, // 선택적으로 값 보이게
+                                  ),
+                                  textAlign: TextAlign.right,
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                        topTitles: AxisTitles(
+                          sideTitles: SideTitles(showTitles: false), // X축 숨김
+                        ),
+                        bottomTitles: AxisTitles(
+                          sideTitles: SideTitles(
+                            showTitles: true,
+                            reservedSize: 30,
+                            getTitlesWidget: (value, meta) {
+                              return Padding(
+                                padding: EdgeInsets.only(top: 8),
+                                child: Text(
+                                  value.toInt().toString(),
+                                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                                  textAlign: TextAlign.center,
+                                ),
+                              );
+                            },
+                          ),
                         ),
                       ),
                       lineBarsData: selectedData.entries
@@ -138,8 +227,7 @@ class _SignalDataPageState extends State<SignalDataPage> {
                           spots: getSignalData(signalData, selectedEntry.key)
                               .asMap()
                               .entries
-                              .map((entry) =>
-                                  FlSpot(entry.key.toDouble(), entry.value))
+                              .map((entry) => FlSpot(entry.key.toDouble(), entry.value))
                               .toList(),
                           isCurved: false,
                           color: dataColors[selectedEntry.key],
@@ -149,34 +237,6 @@ class _SignalDataPageState extends State<SignalDataPage> {
                       }).toList(),
                     ),
                   ),
-                ),
-              ),
-
-              // 그래프 색상 가이드 (범례)
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                child: Wrap(
-                  spacing: 10,
-                  children: selectedData.keys
-                      .where((key) => selectedData[key]!) // 체크된 데이터만 표시
-                      .map((label) {
-                    return Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          width: 12,
-                          height: 12,
-                          decoration: BoxDecoration(
-                            color: dataColors[label],
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                        SizedBox(width: 5),
-                        Text(label.toUpperCase(),
-                            style: TextStyle(fontSize: 12)),
-                      ],
-                    );
-                  }).toList(),
                 ),
               ),
             ],
@@ -190,7 +250,7 @@ class _SignalDataPageState extends State<SignalDataPage> {
   List<double> getSignalData(UserSignalUnitData data, String label) {
     switch (label) {
       case 'ppg':
-        return data.ppg;
+        return normalizePpgData(data.ppg);
       case 'r_signal':
         return data.r_signal;
       case 'g_signal':
