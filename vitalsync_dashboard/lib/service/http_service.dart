@@ -88,10 +88,10 @@ Future<UserSignalUnitData> fetchUserSignalDataWithTime(String user_id, String me
   final response = await http.get(Uri.parse("$BASE_URL$api?user_id=$user_id&measurementTime=$measurementTime"));
 
   if (response.statusCode == 200) {
-    List<dynamic> dataJson = jsonDecode(response.body);
+    dynamic dataJson = jsonDecode(response.body);
 
     if (dataJson.isNotEmpty){
-      UserSignalUnitData userSignalData = UserSignalUnitData.fromJson(dataJson.first);
+      UserSignalUnitData userSignalData = UserSignalUnitData.fromJson(dataJson);
       return userSignalData;
     }
     throw Exception("No data found for $user_id at $measurementTime");

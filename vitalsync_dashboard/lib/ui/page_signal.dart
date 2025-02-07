@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
@@ -21,21 +22,48 @@ class _SignalDataPageState extends State<SignalDataPage> {
   Map<String, bool> selectedData = {}; // 체크된 데이터 목록
   Map<String, Color> dataColors = {}; // 데이터별 색상 매핑
 
+  int minY = 0;
+  int maxY = 255;
+
   @override
   void initState() {
     super.initState();
     initializeDataSelection();
 
-    signalData = fetchUserSignalDataWithTime(widget.userID, widget.measurementTime);
+    signalData =
+        fetchUserSignalDataWithTime(widget.userID, widget.measurementTime);
   }
 
   void initializeDataSelection() {
     List<String> labels = UserSignalUnitData.getDataLabels();
-    List<Color> colors = [Colors.blue, Colors.red, Colors.green, Colors.purple];
+    List<Color> colors = [Colors.black, Colors.red, Colors.green, Colors.blue];
 
     for (int i = 0; i < labels.length; i++) {
       selectedData[labels[i]] = false; // 기본값 false로 설정
       dataColors[labels[i]] = colors[i % colors.length]; // 색상 매핑
+    }
+  }
+
+  void updateRangeY(UserSignalUnitData signalData) {
+    List<double> selectedValues = selectedData.entries
+        .where((entry) => entry.value) // 체크된 항목만 필터링
+        .expand((entry) => getSignalData(signalData, entry.key)) // 데이터 가져오기
+        .toList();
+
+    if (selectedValues.isNotEmpty) {
+      double minValue = selectedValues.reduce((a, b) => a < b ? a : b);
+      double maxValue = selectedValues.reduce((a, b) => a > b ? a : b);
+      double range = (maxValue - minValue) * 0.05;
+
+      setState(() {
+        minY = (minValue - range).floor();
+        maxY = (maxValue + range).ceil();
+      });
+    } else {
+      setState(() {
+        minY = -255; // 기본값으로 초기화
+        maxY = 255;
+      });
     }
   }
 
@@ -75,6 +103,7 @@ class _SignalDataPageState extends State<SignalDataPage> {
                           setState(() {
                             selectedData[label] = value ?? false;
                           });
+                          updateRangeY(signalData); // 선택된 데이터 기반으로 minY 업데이트
                         },
                       ),
                       Text(label.toUpperCase(), style: TextStyle(fontSize: 16)),
@@ -90,8 +119,8 @@ class _SignalDataPageState extends State<SignalDataPage> {
                   padding: const EdgeInsets.all(16.0),
                   child: LineChart(
                     LineChartData(
-                      minY: -1, // 데이터 최소값 설정
-                      maxY: 1, // 데이터 최대값 설정
+                      minY: minY - 1, // 데이터 최소값 설정
+                      maxY: maxY + 1, // 데이터 최대값 설정
                       titlesData: FlTitlesData(
                         bottomTitles: AxisTitles(
                           sideTitles: SideTitles(
@@ -109,12 +138,13 @@ class _SignalDataPageState extends State<SignalDataPage> {
                           spots: getSignalData(signalData, selectedEntry.key)
                               .asMap()
                               .entries
-                              .map((entry) => FlSpot(entry.key.toDouble(), entry.value))
+                              .map((entry) =>
+                                  FlSpot(entry.key.toDouble(), entry.value))
                               .toList(),
                           isCurved: false,
                           color: dataColors[selectedEntry.key],
-                          barWidth: 2,
-                          dotData: FlDotData(show: false),
+                          barWidth: 5,
+                          dotData: FlDotData(show: true),
                         );
                       }).toList(),
                     ),
@@ -142,7 +172,8 @@ class _SignalDataPageState extends State<SignalDataPage> {
                           ),
                         ),
                         SizedBox(width: 5),
-                        Text(label.toUpperCase(), style: TextStyle(fontSize: 12)),
+                        Text(label.toUpperCase(),
+                            style: TextStyle(fontSize: 12)),
                       ],
                     );
                   }).toList(),
