@@ -19,7 +19,7 @@ class UserSignalUnitData{
       r_signal: List<double>.from(json['r_signal'].map((e) => e.toDouble())),
       g_signal: List<double>.from(json['g_signal'].map((e) => e.toDouble())),
       b_signal: List<double>.from(json['b_signal'].map((e) => e.toDouble())),
-      measurementTime: json['measurement_time'],
+      measurementTime: json['MeasurementTime'],
     );
   }
 

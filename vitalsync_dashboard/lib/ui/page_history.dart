@@ -25,6 +25,8 @@ class _UserHistoryPageState extends State<UserHistoryPage> {
     super.initState();
     futureUserData = fetchUserData(widget.userID);
     fetchUserData(widget.userID).then((data) {
+      data.sort((a, b) => b.measurementTime.compareTo(a.measurementTime));
+
       setState(() {
         allUserData = data;
         paginatedUserData = getPaginatedData();
