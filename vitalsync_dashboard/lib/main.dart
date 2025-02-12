@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:vitalsync_dashboard/ui/page_data.dart';
-import 'package:vitalsync_dashboard/ui/page_userlist.dart';
-import 'package:vitalsync_dashboard/ui/page_home.dart';
+import 'package:vitalsync_dashboard/ui/page/page_home.dart';
+import 'package:vitalsync_dashboard/ui/page/page_userlist.dart';
+
 
 void main() {
   runApp(const VitalSyncDashBoard());

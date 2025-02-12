@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:vitalsync_dashboard/ui/page_signal.dart';
-import '../database/user_data.dart';
-import '../service/http_service.dart';
+import 'page_signal.dart';
+import '../../database/user_data.dart';
+import '../../service/http_service.dart';
 
 class UserHistoryPage extends StatefulWidget {
   final String userID;

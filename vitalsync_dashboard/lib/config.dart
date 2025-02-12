@@ -9,3 +9,8 @@ class Config{
   static Config instance = Config();
 
 }
+
+const Map<String, List<String>> OpenDatasetInputExtension = {
+  'UBFC': ['avi', 'txt'],
+  'PURE': ['zip', 'json']
+};

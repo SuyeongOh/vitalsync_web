@@ -3,8 +3,8 @@ import 'package:fl_chart/fl_chart.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-import '../database/user_data.dart';
-import '../service/http_service.dart';
+import '../../database/user_data.dart';
+import '../../service/http_service.dart';
 
 class DataPage extends StatefulWidget {
   final String userID; // 특정 사용자 ID

@@ -4,8 +4,8 @@ import 'dart:math';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
-import '../database/user_signal_data.dart'; // UserSignalData 클래스 추가
-import '../service/http_service.dart';
+import '../../database/user_signal_data.dart'; // UserSignalData 클래스 추가
+import '../../service/http_service.dart';
 
 class SignalDataPage extends StatefulWidget {
   final String userID;

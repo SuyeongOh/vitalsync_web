@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:vitalsync_dashboard/ui/page_data.dart'; // Graph 페이지
-import 'package:vitalsync_dashboard/ui/page_history.dart';
-import '../database/user_list_data.dart';
-import '../service/http_service.dart';
+import 'package:vitalsync_dashboard/ui/page/page_data.dart'; // Graph 페이지
+import 'package:vitalsync_dashboard/ui/page/page_history.dart';
+import '../../database/user_list_data.dart';
+import '../../service/http_service.dart';
 
 class UserListPage extends StatefulWidget {
   @override

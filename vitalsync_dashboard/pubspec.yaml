@@ -53,6 +53,7 @@ dev_dependencies:
   equatable: ^2.0.5
   package_info_plus: ^4.2.0
   dartx: ^1.2.0
+  file_picker: ^6.1.1
 
 flutter:
 

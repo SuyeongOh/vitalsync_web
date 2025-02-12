@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:vitalsync_dashboard/ui/page_main.dart';
-import 'package:vitalsync_dashboard/ui/page_register.dart';
-import 'package:vitalsync_dashboard/ui/page_userlist.dart';
+import 'package:vitalsync_dashboard/ui/page/page_opendata.dart';
+import 'page_main.dart';
+import 'page_userlist.dart';
+import 'page_register.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -41,6 +42,15 @@ class _HomePageState extends State<HomePage> {
               onTap: () {
                 setState(() {
                   body = RegisterPage();
+                });
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              title: Text('Test open data'),
+              onTap: () {
+                setState(() {
+                  body = OpenDataPage();
                 });
                 Navigator.pop(context);
               },
